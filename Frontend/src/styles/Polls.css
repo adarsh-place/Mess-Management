@@ -1,0 +1,145 @@
+.polls-container {
+  padding: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.polls-container h1 {
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 32px;
+}
+
+.polls-list {
+  display: grid;
+  gap: 20px;
+}
+
+.poll-card {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.poll-card h2 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 22px;
+}
+
+.poll-type-badge {
+  display: inline-block;
+  background: #667eea;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.voted-badge {
+  display: inline-block;
+  background: #28a745;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-left: 10px;
+  font-weight: 600;
+}
+
+.options {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.option-btn {
+  padding: 12px 15px;
+  background: #f5f5f5;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  text-align: left;
+}
+
+.option-btn:hover {
+  background: #e8e8ff;
+  border-color: #667eea;
+}
+
+.option-btn input[type="radio"],
+.option-btn input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.option-btn.selected {
+  background: #e8e8ff;
+  border-color: #667eea;
+  font-weight: 600;
+}
+
+.option-btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f5f5f5;
+}
+
+.option-btn span:first-of-type {
+  color: #333;
+  flex: 1;
+}
+
+.option-btn .votes {
+  color: #999;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.option-btn .your-choice {
+  color: #28a745;
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.vote-btn {
+  padding: 10px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  transition: all 0.3s;
+}
+
+.vote-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.vote-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.poll-card small {
+  color: #999;
+  font-size: 12px;
+  display: block;
+}
+
