@@ -11,6 +11,9 @@ export const ComplaintsPage = () => {
   const [complaints, setComplaints] = useState([]);
   const [complaintsLoading, setComplaintsLoading] = useState(false);
   const [expandedComplaint, setExpandedComplaint] = useState(null);
+  const [replyMessages, setReplyMessages] = useState({});
+  const [replyLoading, setReplyLoading] = useState({});
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     if (tab === 'history') {
@@ -42,6 +45,8 @@ export const ComplaintsPage = () => {
       setMessage('Complaint submitted successfully!');
       setText('');
       setImageUrl('');
+      setTab('history');
+      fetchMyComplaints();
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage('Error submitting complaint');
@@ -110,11 +115,25 @@ export const ComplaintsPage = () => {
         </form>
       ) : (
         <div className="complaints-history">
+          <div style={{ marginBottom: 16 }}>
+            <label htmlFor="statusFilter">Filter by Status: </label>
+            <select
+              id="statusFilter"
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="pending">Pending</option>
+              <option value="resolved">Solved</option>
+            </select>
+          </div>
           {complaintsLoading ? (
             <p>Loading your complaints...</p>
           ) : complaints.length > 0 ? (
             <div className="complaints-list">
-              {complaints.map((complaint) => (
+              {complaints
+                .filter(c => statusFilter === 'all' ? true : c.status === statusFilter)
+                .map((complaint) => (
                 <div key={complaint._id} className="complaint-card">
                   <div className="complaint-header">
                     <div>
@@ -145,11 +164,19 @@ export const ComplaintsPage = () => {
 
                   {complaint.replies && complaint.replies.length > 0 && (
                     <div className="replies-section">
-                      <h5>📧 Replies from Secretary:</h5>
+                      <h5>📧 Replies:</h5>
                       {complaint.replies.map((reply, idx) => (
                         <div key={idx} className="reply-item">
                           <div className="reply-header">
-                            <strong>{reply.secretaryId?.name || 'Secretary'}</strong>
+                            <strong>
+                              {reply.secretaryId?.name
+                                ? reply.secretaryId.name
+                                : reply.studentId?.name
+                                ? reply.studentId.name
+                                : reply.secretaryId
+                                ? 'Secretary'
+                                : 'Student'}
+                            </strong>
                             <small>{new Date(reply.repliedAt).toLocaleDateString()}</small>
                           </div>
                           <p>{reply.message}</p>
@@ -158,12 +185,65 @@ export const ComplaintsPage = () => {
                     </div>
                   )}
 
+                  {/* Student Reply Form */}
                   <button
-                    className="expand-btn"
+                    className="reply-toggle-btn"
                     onClick={() => setExpandedComplaint(expandedComplaint === complaint._id ? null : complaint._id)}
                   >
-                    {expandedComplaint === complaint._id ? '▼ Hide Details' : '▶ Show Details'}
+                    {expandedComplaint === complaint._id ? 'Cancel Reply' : 'Reply to Complaint'}
                   </button>
+
+                  {expandedComplaint === complaint._id && (
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        const replyMessage = replyMessages[complaint._id] || '';
+                        if (!replyMessage.trim()) {
+                          alert('Reply message cannot be empty');
+                          return;
+                        }
+                        setReplyLoading((prev) => ({ ...prev, [complaint._id]: true }));
+                        try {
+                          await axios.post(`http://localhost:5000/api/complaints/${complaint._id}/reply`, {
+                            message: replyMessage,
+                          });
+                          setComplaints((prev) => prev.map((c) =>
+                            c._id === complaint._id
+                              ? {
+                                  ...c,
+                                  replies: [
+                                    ...c.replies,
+                                    {
+                                      message: replyMessage,
+                                      repliedAt: new Date(),
+                                      studentId: { name: 'You' },
+                                    },
+                                  ],
+                                }
+                              : c
+                          ));
+                          setReplyMessages((prev) => ({ ...prev, [complaint._id]: '' }));
+                          setExpandedComplaint(null);
+                        } catch (error) {
+                          alert(error.response?.data?.message || 'Error sending reply');
+                        } finally {
+                          setReplyLoading((prev) => ({ ...prev, [complaint._id]: false }));
+                        }
+                      }}
+                      className="reply-form"
+                    >
+                      <textarea
+                        value={replyMessages[complaint._id] || ''}
+                        onChange={e => setReplyMessages(prev => ({ ...prev, [complaint._id]: e.target.value }))}
+                        placeholder="Enter your reply..."
+                        className="reply-input"
+                        rows="4"
+                      ></textarea>
+                      <button type="submit" className="send-reply-btn" disabled={replyLoading[complaint._id]}>
+                        {replyLoading[complaint._id] ? 'Submitting...' : 'Send Reply'}
+                      </button>
+                    </form>
+                  )}
                 </div>
               ))}
             </div>

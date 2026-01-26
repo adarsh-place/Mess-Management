@@ -24,8 +24,8 @@ exports.createNotice = async (req, res) => {
     // Send notification to all members
     const allUsers = await User.find({ role: 'student' });
     const emails = allUsers.map(u => u.email);
-
-    await sendNoticeToMembers(emails, { title, message });
+    console.log(emails);
+    sendNoticeToMembers(emails, { title, message }); // fire and forget, do not await
 
     res.status(201).json({ message: 'Notice created and sent', notice });
   } catch (error) {

@@ -12,6 +12,21 @@ exports.submitFeedback = async (req, res) => {
       return res.status(400).json({ message: 'Meal type and rating are required' });
     }
 
+    // Check if feedback already exists for this user, meal, and day
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const existing = await Feedback.findOne({
+      studentId: req.userId,
+      mealType,
+      createdAt: { $gte: startOfDay, $lte: endOfDay },
+    });
+    if (existing) {
+      return res.status(409).json({ message: 'You have already submitted feedback for this meal today.' });
+    }
+
     const feedback = new Feedback({
       studentId: req.userId,
       mealType,
@@ -31,11 +46,7 @@ exports.submitFeedback = async (req, res) => {
 // @access  Private (Secretary)
 exports.getAllFeedback = async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
-    if (user.role !== 'secretary') {
-      return res.status(403).json({ message: 'Only secretaries can view feedback' });
-    }
-
+    // Any authenticated user can view all feedback
     const feedback = await Feedback.find().populate('studentId', 'name email');
     res.status(200).json(feedback);
   } catch (error) {

@@ -24,6 +24,10 @@ const ComplaintSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
       },
+      studentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
       message: {
         type: String,
         required: true,

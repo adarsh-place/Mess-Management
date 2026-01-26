@@ -101,8 +101,8 @@ exports.updateComplaintStatus = async (req, res) => {
 exports.addReply = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
-    if (user.role !== 'secretary') {
-      return res.status(403).json({ message: 'Only secretaries can reply to complaints' });
+    if (user.role !== 'secretary' && user.role !== 'student') {
+      return res.status(403).json({ message: 'Only secretaries and students can reply to complaints' });
     }
 
     const { complaintId } = req.params;
@@ -118,18 +118,24 @@ exports.addReply = async (req, res) => {
     }
 
     // Add reply
-    complaint.replies.push({
-      secretaryId: req.userId,
-      message,
-    });
+    if (user.role === 'secretary') {
+      complaint.replies.push({
+        secretaryId: req.userId,
+        message,
+      });
+    } else if (user.role === 'student') {
+      complaint.replies.push({
+        studentId: req.userId,
+        message,
+      });
+    }
 
     await complaint.save();
 
-    // Send notification to student who raised the complaint
+    // Send notification to student who raised the complaint (when secretary replies)
     const student = await User.findById(complaint.studentId);
     const secretary = await User.findById(req.userId);
-    
-    if (student) {
+    if (user.role === 'secretary' && student) {
       const { sendReplyNotification } = require('../utils/emailService');
       await sendReplyNotification(student.email, {
         studentName: student.name,

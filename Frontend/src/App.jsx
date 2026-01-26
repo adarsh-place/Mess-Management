@@ -27,6 +27,7 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   if (loading) {
     return <div className="loading-container">Loading...</div>;
   }
+  console.log(token, user);
 
   if (!token || !user) {
     return <Navigate to="/login" />;
@@ -37,6 +38,12 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   }
 
   return children;
+};
+
+// Public Route — redirects authenticated users away from auth pages
+const PublicRoute = ({ children }) => {
+  const { user } = useContext(AuthContext);
+  return user ? <Navigate to="/dashboard" /> : children;
 };
 
 // Role-based Dashboard Component
@@ -53,7 +60,6 @@ const DashboardRouter = () => {
 // Navigation Component
 const Navigation = () => {
   const { user, logout } = useContext(AuthContext);
-
   if (!user) return null;
 
   return (
@@ -78,14 +84,15 @@ const Navigation = () => {
 };
 
 function App() {
+  // Do not consume AuthContext at the top-level of App — the provider is rendered below.
   return (
     <Router>
       <AuthProvider>
         <Navigation />
         <Routes>
           {/* Public Routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
 
           {/* Dashboard Route - Shows different content based on role */}
           <Route

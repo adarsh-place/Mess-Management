@@ -1,43 +1,54 @@
 .menu-container {
-  padding: 40px;
+  padding: 40px 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .menu-container h1 {
-  color: #333;
-  margin-bottom: 30px;
+  color: #1a202c;
+  margin-bottom: 32px;
   font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .menus-list {
   display: grid;
-  gap: 20px;
+  gap: 24px;
 }
 
 .menu-card {
   background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 250ms cubic-bezier(0.4,0,0.2,1);
+  border: 1px solid #edf2f7;
+}
+
+.menu-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
 }
 
 .menu-card h2 {
   color: #667eea;
   margin-bottom: 20px;
-  font-size: 24px;
+  font-size: 22px;
+  font-weight: 700;
   border-bottom: 2px solid #667eea;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
 }
 
 .meal-section {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .meal-section h3 {
-  color: #333;
-  margin-bottom: 10px;
-  font-size: 18px;
+  color: #2d3748;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .meal-section ul {
@@ -47,14 +58,15 @@
 }
 
 .meal-section li {
-  padding: 8px 0;
-  color: #666;
-  border-bottom: 1px solid #f0f0f0;
-  padding-left: 20px;
+  padding: 10px 0 10px 20px;
+  color: #4a5568;
+  border-bottom: 1px solid #edf2f7;
+  font-size: 14px;
+  position: relative;
 }
 
 .meal-section li:before {
-  content: "• ";
+  content: "\2713";
   color: #667eea;
   font-weight: bold;
   margin-left: -15px;
@@ -63,4 +75,21 @@
 
 .meal-section li:last-child {
   border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .menu-container { padding: 24px 16px; }
+  .menu-container h1 { font-size: 24px; margin-bottom: 24px; }
+  .menus-list { gap: 16px; }
+  .menu-card { padding: 20px; }
+  .menu-card h2 { font-size: 18px; }
+}
+
+@media (max-width: 480px) {
+  .menu-container { padding: 16px 12px; }
+  .menu-container h1 { font-size: 20px; }
+  .menu-card { padding: 16px; }
+  .menu-card h2 { font-size: 17px; margin-bottom: 16px; }
+  .meal-section h3 { font-size: 14px; }
+  .meal-section li { padding: 8px 0 8px 18px; font-size: 13px; }
 }

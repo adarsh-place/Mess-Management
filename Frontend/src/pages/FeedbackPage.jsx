@@ -23,11 +23,23 @@ export const FeedbackPage = () => {
       setDescription('');
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
-      setMessage('Error submitting feedback');
+      if (error.response && error.response.status === 409) {
+        setMessage('You have already submitted feedback for this meal today.');
+      } else {
+        setMessage('Error submitting feedback');
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
   return (
     <div className="feedback-container">
@@ -35,7 +47,12 @@ export const FeedbackPage = () => {
       {message && <div className="message">{message}</div>}
       <form onSubmit={handleSubmit} className="feedback-form">
         <div className="form-group">
-          <label>Meal Type:</label>
+          <label>
+            Today's Meal Type:
+            <span style={{ marginLeft: 10, fontWeight: 400, color: '#555', fontSize: '0.95em' }}>
+              ({formattedDate})
+            </span>
+          </label>
           <select value={mealType} onChange={(e) => setMealType(e.target.value)}>
             <option value="breakfast">Breakfast</option>
             <option value="lunch">Lunch</option>

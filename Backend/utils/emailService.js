@@ -2,7 +2,9 @@ const nodemailer = require('nodemailer');
 
 // Create transporter
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Change to your email service provider
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // use TLS
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -28,6 +30,7 @@ const sendEmail = async (to, subject, html) => {
 
 // Function to send complaint notification to mess secretary
 const sendComplaintNotification = async (secretaryEmail, complaintDetails) => {
+  console.log(secretaryEmail);
   const subject = 'New Complaint Received';
   const html = `
     <h2>New Complaint</h2>

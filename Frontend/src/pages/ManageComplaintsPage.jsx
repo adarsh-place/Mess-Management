@@ -9,6 +9,7 @@ export const ManageComplaintsPage = () => {
   const [expandedComplaint, setExpandedComplaint] = useState(null);
   const [replyMessage, setReplyMessage] = useState('');
   const [replyLoading, setReplyLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchComplaints();
@@ -37,7 +38,7 @@ export const ManageComplaintsPage = () => {
       await axios.post(`http://localhost:5000/api/complaints/${complaintId}/reply`, {
         message: replyMessage,
       });
-      alert('Reply sent successfully to the student!');
+      //alert('Reply sent successfully to the student!');
       setReplyMessage('');
       setExpandedComplaint(null);
       fetchComplaints();
@@ -53,11 +54,25 @@ export const ManageComplaintsPage = () => {
     <div className="secretary-container">
       <h1>Manage Complaints</h1>
 
+      <div style={{ marginBottom: 16 }}>
+        <label htmlFor="statusFilter">Filter by Status: </label>
+        <select
+          id="statusFilter"
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value)}
+        >
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="resolved">Solved</option>
+        </select>
+      </div>
       {loading ? (
         <p>Loading...</p>
       ) : complaints.length > 0 ? (
         <div className="complaints-list">
-          {complaints.map((complaint) => (
+          {complaints
+            .filter(c => statusFilter === 'all' ? true : c.status === statusFilter)
+            .map((complaint) => (
             <div key={complaint._id} className="complaint-item">
               <div className="complaint-header">
                 <h4>From {complaint.studentId?.name}</h4>
