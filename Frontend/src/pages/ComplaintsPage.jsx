@@ -14,6 +14,7 @@ export const ComplaintsPage = () => {
   const [replyMessages, setReplyMessages] = useState({});
   const [replyLoading, setReplyLoading] = useState({});
   const [statusFilter, setStatusFilter] = useState('all');
+  const [imageErrors, setImageErrors] = useState({});
 
   useEffect(() => {
     if (tab === 'history') {
@@ -106,8 +107,16 @@ export const ComplaintsPage = () => {
               type="url"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="Paste image URL"
+              placeholder="Paste direct image URL (see below)"
             />
+            <small style={{ color: '#888', display: 'block', marginTop: 4 }}>
+              Use a direct image link (ending in .jpg, .png, etc).<br />
+              <b>For Google Drive:</b> Share your image, then use:<br />
+              <span style={{ fontFamily: 'monospace', fontSize: 12 }}>
+                https://drive.google.com/uc?export=view&id=<i>FILE_ID</i>
+              </span><br />
+              (Replace <i>FILE_ID</i> with the part after <b>/d/</b> and before <b>/view</b> in your share link)
+            </small>
           </div>
           <button type="submit" disabled={loading}>
             {loading ? 'Submitting...' : 'Submit Complaint'}
@@ -116,7 +125,7 @@ export const ComplaintsPage = () => {
       ) : (
         <div className="complaints-history">
           <div style={{ marginBottom: 16 }}>
-            <label htmlFor="statusFilter">Filter by Status: </label>
+            <label htmlFor="statusFilter">Filter by Status: </label>  
             <select
               id="statusFilter"
               value={statusFilter}
@@ -137,12 +146,11 @@ export const ComplaintsPage = () => {
                 <div key={complaint._id} className="complaint-card">
                   <div className="complaint-header">
                     <div>
-                      <h4>{complaint.text.substring(0, 60)}...</h4>
                       <small className="complaint-date">{new Date(complaint.createdAt).toLocaleDateString()}</small>
                     </div>
                     <div className="status-actions">
                       <span className={`status-badge ${complaint.status}`}>
-                        {complaint.status === 'pending' ? '⏳ Pending' : '✅ Solved'}
+                        {complaint.status === 'pending' ? '⏳' : '✅ Solved'}
                       </span>
                       {complaint.status === 'pending' && (
                         <button
@@ -156,8 +164,13 @@ export const ComplaintsPage = () => {
                     </div>
                   </div>
 
-                  {complaint.imageUrl && (
-                    <img src={complaint.imageUrl} alt="Complaint" className="complaint-image" />
+                  {complaint.imageUrl && !imageErrors[complaint._id] && (
+                    <img 
+                      src={complaint.imageUrl} 
+                      alt="Complaint" 
+                      className="complaint-image"
+                      onError={() => setImageErrors(prev => ({ ...prev, [complaint._id]: true }))}
+                    />
                   )}
 
                   <p className="complaint-text">{complaint.text}</p>

@@ -23,6 +23,7 @@ const complaintRoutes = require('./routes/complaintRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const menuRoutes = require('./routes/menuRoutes');
 const noticeRoutes = require('./routes/noticeRoutes');
+const allowedEmailsRoutes = require('./routes/allowedEmailsRoutes');
 
 // Basic Route
 app.get('/', (req, res) => {
@@ -36,6 +37,7 @@ app.use('/api/complaints', complaintRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/notices', noticeRoutes);
+app.use('/api/allowed-emails', allowedEmailsRoutes);
 
 const PORT = process.env.PORT || 5000;
 

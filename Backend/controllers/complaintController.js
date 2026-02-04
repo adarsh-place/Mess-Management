@@ -16,15 +16,16 @@ exports.submitComplaint = async (req, res) => {
 
     await complaint.save();
 
-    // Send notification to mess secretary
+    // Send notification to mess secretary (non-blocking)
     const secretary = await User.findOne({ role: 'secretary' });
     if (secretary) {
       const student = await User.findById(req.userId);
-      await sendComplaintNotification(secretary.email, {
+      // Fire and forget - don't await
+      sendComplaintNotification(secretary.email, {
         studentName: student.name,
         text,
         imageUrl,
-      });
+      }).catch(err => console.error('Email sending failed silently:', err.message));
     }
 
     res.status(201).json({ message: 'Complaint submitted successfully', complaint });
@@ -37,11 +38,6 @@ exports.submitComplaint = async (req, res) => {
 // @access  Private (Secretary)
 exports.getAllComplaints = async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
-    if (user.role !== 'secretary') {
-      return res.status(403).json({ message: 'Only secretaries can view complaints' });
-    }
-
     const complaints = await Complaint.find().populate('studentId', 'name email');
     res.status(200).json(complaints);
   } catch (error) {
@@ -82,6 +78,9 @@ exports.updateComplaintStatus = async (req, res) => {
     }
     if (user.role === 'student' && status === 'pending') {
       return res.status(403).json({ message: 'Students can only mark complaints as resolved' });
+    }
+    if (user.role === 'secretary') {
+      return res.status(403).json({ message: 'Secretary can not mark complaints as resolved' });
     }
 
     const updatedComplaint = await Complaint.findByIdAndUpdate(

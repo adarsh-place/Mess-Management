@@ -3,6 +3,7 @@ import axios from 'axios';
 
 export const AuthContext = createContext();
 
+
 // Helper function to decode JWT and extract user info
 const decodeToken = (token) => {
   try {
@@ -25,6 +26,24 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+    
+  // Google login
+    const googleLogin = async (idToken) => {
+      setLoading(true);
+      try {
+        const response = await axios.post('http://localhost:5000/api/auth/google', { idToken });
+        setToken(response.data.token);
+        setUser(response.data.user);
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        return response.data;
+      } catch (error) {
+        throw error.response?.data?.message || 'Google login failed';
+      } finally {
+        setLoading(false);
+      }
+    };
 
   // Initialize auth state from localStorage on mount
   useEffect(() => {
@@ -52,27 +71,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const register = async (name, email, password, role) => {
-    setLoading(true);
-    try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
-        name,
-        email,
-        password,
-        role,
-      });
-      setToken(response.data.token);
-      setUser(response.data.user);
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-      return response.data;
-    } catch (error) {
-      throw error.response?.data?.message || 'Registration failed';
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const login = async (email, password) => {
     setLoading(true);
@@ -103,7 +101,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, register, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout, googleLogin }}>
       {children}
     </AuthContext.Provider>
   );

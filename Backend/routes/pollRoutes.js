@@ -6,12 +6,13 @@ const {
   deletePoll,
 } = require('../controllers/pollController');
 const authMiddleware = require('../middleware/authMiddleware');
+const secretaryMiddleware = require('../middleware/secretaryMiddleware');
 
 const router = express.Router();
 
-router.post('/', authMiddleware, createPoll);
+router.post('/', authMiddleware, secretaryMiddleware, createPoll);
 router.get('/', getAllPolls);
 router.post('/vote', authMiddleware, votePoll);
-router.delete('/:pollId', authMiddleware, deletePoll);
+router.delete('/:pollId', authMiddleware, secretaryMiddleware, deletePoll);
 
 module.exports = router;

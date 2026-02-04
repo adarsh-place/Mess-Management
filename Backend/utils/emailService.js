@@ -9,6 +9,8 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 10000, // 10 seconds
+  socketTimeout: 10000, // 10 seconds
 });
 
 // Function to send email
@@ -24,7 +26,9 @@ const sendEmail = async (to, subject, html) => {
     await transporter.sendMail(mailOptions);
     console.log(`Email sent to ${to}`);
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending email:', error.message);
+    // Don't throw - allow app to continue even if email fails
+    return false;
   }
 };
 

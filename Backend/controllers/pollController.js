@@ -7,12 +7,6 @@ exports.createPoll = async (req, res) => {
   try {
     const { question, options, pollType = 'single', expiresAt } = req.body;
 
-    // Verify user is secretary
-    const user = await User.findById(req.userId);
-    if (user.role !== 'secretary') {
-      return res.status(403).json({ message: 'Only secretaries can create polls' });
-    }
-
     // Create poll
     const poll = new Poll({
       question,
@@ -109,12 +103,6 @@ exports.votePoll = async (req, res) => {
 exports.deletePoll = async (req, res) => {
   try {
     const { pollId } = req.params;
-
-    // Verify user is secretary
-    const user = await User.findById(req.userId);
-    if (user.role !== 'secretary') {
-      return res.status(403).json({ message: 'Only secretaries can delete polls' });
-    }
 
     const poll = await Poll.findById(pollId);
     if (!poll) {

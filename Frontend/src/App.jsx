@@ -5,10 +5,8 @@ import './App.css';
 
 // Import pages
 import { LoginPage } from './pages/LoginPage';
-import { SignupPage } from './pages/SignupPage';
 import { StudentDashboard } from './pages/StudentDashboard';
-import { SecretaryDashboard } from './pages/SecretaryDashboard';
-import { SecretaryMenuPage } from './pages/SecretaryMenuPage';
+import { SecretaryDashboardPage } from './pages/SecretaryDashboardPage';
 import { PollsPage } from './pages/PollsPage';
 import { ComplaintsPage } from './pages/ComplaintsPage';
 import { FeedbackPage } from './pages/FeedbackPage';
@@ -19,6 +17,7 @@ import { ManagePollsPage } from './pages/ManagePollsPage';
 import { ViewFeedbackPage } from './pages/ViewFeedbackPage';
 import { ManageComplaintsPage } from './pages/ManageComplaintsPage';
 import { SecretaryOverviewPage } from './pages/SecretaryOverviewPage';
+import ManageAllowedEmailsPage from './pages/ManageAllowedEmailsPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requiredRole = null }) => {
@@ -51,7 +50,7 @@ const DashboardRouter = () => {
   const { user } = useContext(AuthContext);
   
   if (user?.role === 'secretary') {
-    return <SecretaryMenuPage />;
+    return <SecretaryDashboardPage />;
   }
   
   return <StudentDashboard />;
@@ -92,7 +91,6 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-          <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
 
           {/* Dashboard Route - Shows different content based on role */}
           <Route
@@ -226,6 +224,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ViewFeedbackPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manage-students"
+            element={
+              <ProtectedRoute requiredRole="secretary">
+                <ManageAllowedEmailsPage />
               </ProtectedRoute>
             }
           />

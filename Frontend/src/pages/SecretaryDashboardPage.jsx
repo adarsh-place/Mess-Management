@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import '../styles/Secretary.css';
 
-export const SecretaryMenuPage = () => {
+export const SecretaryDashboardPage = () => {
   const navigate = useNavigate();
 
   const features = [
@@ -40,6 +40,12 @@ export const SecretaryMenuPage = () => {
       description: 'Broadcast notices to all students',
       icon: '📢',
       route: '/secretary/notices',
+    },
+    {
+      title: 'Manage Students',
+      description: 'Add or Remove students',
+      icon: '📢',
+      route: '/manage-students',
     },
   ];
 

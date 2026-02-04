@@ -10,31 +10,31 @@ exports.createMenu = async (req, res) => {
     if (user.role !== 'secretary') {
       return res.status(403).json({ message: 'Only secretaries can create menus' });
     }
-
-    const { date, breakfast, lunch, dinner } = req.body;
-
-    const menu = new Menu({
-      date,
-      breakfast,
-      lunch,
-      dinner,
-      createdBy: req.userId,
-    });
-
-    await menu.save();
-
+    
+    const { days } = req.body;
+    if (!days) {
+      return res.status(400).json({ message: 'Days are required' });
+    }
+    
+    let menu = await Menu.findOne({});
+    if (menu) {
+      menu.days = days;
+      menu.updatedAt = Date.now();
+      await menu.save();
+    } 
+    else {
+      console.log("aa");
+      menu = new Menu({ days });
+      await menu.save();
+    }
+    
     // Send notification to all members
     const allUsers = await User.find({ role: 'student' });
     const emails = allUsers.map(u => u.email);
 
-    await sendMenuUpdateNotification(emails, {
-      date,
-      breakfast,
-      lunch,
-      dinner,
-    });
+    await sendMenuUpdateNotification(emails, {days});
 
-    res.status(201).json({ message: 'Menu created and notification sent', menu });
+    res.status(200).json({ message: 'Weekly menu updated and notification sent', menu });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -89,5 +89,3 @@ exports.updateMenu = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-
-module.exports = exports;
