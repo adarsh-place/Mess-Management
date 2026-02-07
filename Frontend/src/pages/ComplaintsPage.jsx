@@ -167,10 +167,26 @@ export const ComplaintsPage = () => {
                   {complaint.imageUrl && !imageErrors[complaint._id] && (
                     <img 
                       src={complaint.imageUrl} 
-                      alt="Complaint" 
+                      alt="Complaint"
                       className="complaint-image"
                       onError={() => setImageErrors(prev => ({ ...prev, [complaint._id]: true }))}
                     />
+                  )}
+                  {complaint.imageUrl && imageErrors[complaint._id] && (
+                    <div className="image-error-placeholder" style={{ color: 'red', margin: '8px 0' }}>
+                      <div style={{
+                        width: '100%',
+                        height: '180px',
+                        background: '#f8d7da',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid #f5c2c7',
+                        borderRadius: 8
+                      }}>
+                        <span>Image could not be loaded</span>
+                      </div>
+                    </div>
                   )}
 
                   <p className="complaint-text">{complaint.text}</p>

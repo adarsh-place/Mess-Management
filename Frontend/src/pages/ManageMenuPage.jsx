@@ -3,22 +3,15 @@ import axios from 'axios';
 import '../styles/Secretary.css';
 
 export const ManageMenuPage = () => {
-  const [date, setDate] = useState('');
-  const [breakfast, setBreakfast] = useState('');
-  const [lunch, setLunch] = useState('');
-  const [dinner, setDinner] = useState('');
   const [menu, setMenu] = useState({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
   const days = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+    'Common','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
   ];
-  const timings = {
-    breakfast: '8:00 AM - 9:00 AM',
-    lunch: '1:00 PM - 2:00 PM',
-    dinner: '8:00 PM - 9:00 PM',
-  };
+  const [timings, setTimings] = useState(['8:00 AM - 9:00 AM','1:00 PM - 2:00 PM','8:00 PM - 9:00 PM']);
+  
   const [editDay, setEditDay] = useState('');
   const [editMeal, setEditMeal] = useState('breakfast');
   const [editValue, setEditValue] = useState('');
@@ -28,61 +21,61 @@ export const ManageMenuPage = () => {
     fetchMenu();
   }, []);
 
+    // Notify everyone after menu update
+  const handleNotifyEveryone = async () => {
+    setLoading(true);
+    try {
+      setMessage('Sending notification to everyone!');
+      setLoading(false);
+      await axios.post('http://localhost:5000/api/menu/email');
+      setTimeout(() => setMessage(''), 3000);
+      setMessage('Notifications sent successfully');
+    } catch (err) {
+      setMessage('Error sending notification');
+    } finally {
+    }
+  };
+
+    // Save timings independently
+  const handleSaveTimings = async () => {
+    setLoading(true);
+    try {
+      // Send only timings to backend (keep menu unchanged)
+      await axios.put('http://localhost:5000/api/menu/timings', {timings
+      });
+      setMessage('Timings updated!');
+      setTimeout(() => setMessage(''), 3000);
+      fetchMenu();
+    } catch (err) {
+      setMessage('Error updating timings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchMenu = async () => {
     setLoading(true);
     try {
       const res = await axios.get('http://localhost:5000/api/menu');
-      // Assume backend returns array, take latest
-      const latest = res.data[0];
-      if (latest && latest.breakfast && latest.lunch && latest.dinner) {
-        // Convert backend format to frontend format
-        const backendDays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+      const data = res.data;
+      if (data && data.days) {
+        if (data.timings && Array.isArray(data.timings)) {
+          setTimings(data.timings);
+        }
+        const backendDays = ['Common','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
         const newMenu = {};
         backendDays.forEach(day => {
+          const arr = data.days[day] || ['', '', ''];
           newMenu[day] = {
-            breakfast: (latest.breakfast[day] || []).join(', '),
-            lunch: (latest.lunch[day] || []).join(', '),
-            dinner: (latest.dinner[day] || []).join(', '),
+            breakfast: arr[0] || '',
+            lunch: arr[1] || '',
+            dinner: arr[2] || '',
           };
         });
         setMenu(newMenu);
       }
     } catch (err) {
       setMessage('Error fetching menu');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getMonday = (d = new Date()) => {
-    d = new Date(d);
-    const day = d.getDay(), diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    return new Date(d.setDate(diff));
-  };
-
-  const handleSaveMenu = async () => {
-    setLoading(true);
-    try {
-      // Convert frontend format to backend format
-      const backendDays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-      console.log(backendDays);
-      const daysObj = {};
-      backendDays.forEach(day => {
-        daysObj[day] = {
-          breakfast: menu[day],
-          lunch: menu[day],
-          dinner: menu[day],        };
-      });
-      console.log(daysObj);
-      await axios.post('http://localhost:5000/api/menu', {
-        weekStart: getMonday(),
-        days: daysObj,
-      });
-      setMessage('Menu saved to backend!');
-      setTimeout(() => setMessage(''), 3000);
-      fetchMenu();
-    } catch (err) {
-      setMessage('Error saving menu');
     } finally {
       setLoading(false);
     }
@@ -102,15 +95,40 @@ export const ManageMenuPage = () => {
   const handleEditValueChange = (e) => {
     setEditValue(e.target.value);
   };
-  const handleEditSave = () => {
-    setMenu(prev => ({
-      ...prev,
-      [editDay]: {
-        ...prev[editDay],
-        [editMeal]: editValue,
-      },
-    }));
-    setEditDay('');
+  const handleEditSave = async () => {
+    setLoading(true);
+    try {
+      // Update local state
+      setMenu(prev => ({
+        ...prev,
+        [editDay]: {
+          ...prev[editDay],
+          [editMeal]: editValue,
+        },
+      }));
+      // Prepare days object in array format
+      const backendDays = ['Common','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+      const daysObj = {};
+      backendDays.forEach(day => {
+        daysObj[day] = [
+          (day === editDay && editMeal === 'breakfast') ? editValue : menu[day]?.breakfast || '',
+          (day === editDay && editMeal === 'lunch') ? editValue : menu[day]?.lunch || '',
+          (day === editDay && editMeal === 'dinner') ? editValue : menu[day]?.dinner || ''
+        ];
+      });
+      await axios.put('http://localhost:5000/api/menu', {
+        days: daysObj,
+        timings
+      });
+      setMessage('Meal updated and saved!');
+      setTimeout(() => setMessage(''), 3000);
+      fetchMenu();
+    } catch (err) {
+      setMessage('Error updating meal');
+    } finally {
+      setLoading(false);
+      setEditDay('');
+    }
   };
 
   return (
@@ -121,9 +139,21 @@ export const ManageMenuPage = () => {
         <thead>
           <tr>
             <th style={{ width: '120px' }}>Day</th>
-            <th style={{ width: '220px' }}>Breakfast<br /><span style={{ fontWeight: 'normal', fontSize: 12 }}>{timings.breakfast}</span></th>
-            <th style={{ width: '220px' }}>Lunch<br /><span style={{ fontWeight: 'normal', fontSize: 12 }}>{timings.lunch}</span></th>
-            <th style={{ width: '220px' }}>Dinner<br /><span style={{ fontWeight: 'normal', fontSize: 12 }}>{timings.dinner}</span></th>
+            <th style={{ width: '220px' }}>Breakfast</th>
+            <th style={{ width: '220px' }}>Lunch</th>
+            <th style={{ width: '220px' }}>Dinner</th>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <input type="text" value={timings[0]} onChange={e => setTimings([e.target.value, timings[1], timings[2]])} style={{ width: '90%' }} />
+            </td>
+            <td>
+              <input type="text" value={timings[1]} onChange={e => setTimings([timings[0], e.target.value, timings[2]])} style={{ width: '90%' }} />
+            </td>
+            <td>
+              <input type="text" value={timings[2]} onChange={e => setTimings([timings[0], timings[1], e.target.value])} style={{ width: '90%' }} />
+            </td>
           </tr>
         </thead>
         <tbody>
@@ -162,13 +192,13 @@ export const ManageMenuPage = () => {
               <label>Menu Items:&nbsp;</label>
               <input type="text" value={editValue} onChange={handleEditValueChange} style={{ width: 300 }} />
             </div>
-            <button type="button" onClick={handleEditSave} style={{ marginRight: 8 }}>Save</button>
             <button type="button" onClick={() => setEditDay('')}>Cancel</button>
           </>
         )}
       </div>
-      <button type="button" onClick={handleSaveMenu} disabled={loading} style={{ marginBottom: 24 }}>
-        {loading ? 'Saving...' : 'Save Menu'}
+      <button type="button" onClick={handleEditSave} style={{ marginRight: 8 }}>Save</button>
+      <button type="button" onClick={handleNotifyEveryone} disabled={loading} style={{ marginBottom: 24 }}>
+        {loading ? 'Notifying...' : 'Notify Everyone'}
       </button>
       {/* <form onSubmit={handleSubmit} className="secretary-form">
         <div className="form-group">

@@ -1,15 +1,17 @@
 const express = require('express');
 const {
-  createMenu,
   getMenu,
   updateMenu,
+  emailMenu,
 } = require('../controllers/menuController');
 const authMiddleware = require('../middleware/authMiddleware');
+const secretaryMiddleware = require('../middleware/secretaryMiddleware');
 
 const router = express.Router();
 
-router.post('/', authMiddleware, createMenu);
+
 router.get('/', getMenu);
-router.put('/:menuId', authMiddleware, updateMenu);
+router.put('/', authMiddleware,secretaryMiddleware, updateMenu);
+router.post('/email', authMiddleware, secretaryMiddleware, emailMenu);
 
 module.exports = router;

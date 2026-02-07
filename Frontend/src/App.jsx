@@ -26,7 +26,6 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   if (loading) {
     return <div className="loading-container">Loading...</div>;
   }
-  console.log(token, user);
 
   if (!token || !user) {
     return <Navigate to="/login" />;

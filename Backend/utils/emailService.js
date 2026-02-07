@@ -1,3 +1,17 @@
+// Function to send menu PDF to all members
+const emailMenuPDF = async (emails, pdfBuffer, html) => {
+  const subject = 'Mess Menu Timetable';
+  const htmlBody = html || '<h2>Mess Menu Timetable</h2><p>Find attached the current menu timetable PDF.</p>';
+  for (const email of emails) {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject,
+      html: htmlBody,
+      attachments: [{ filename: 'menu.pdf', content: pdfBuffer }]
+    });
+  }
+};
 const nodemailer = require('nodemailer');
 
 // Create transporter
@@ -98,4 +112,5 @@ module.exports = {
   sendReplyNotification,
   sendNoticeToMembers,
   sendMenuUpdateNotification,
+  emailMenuPDF,
 };
