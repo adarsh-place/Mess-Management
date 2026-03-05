@@ -150,17 +150,8 @@ export const ComplaintsPage = () => {
                     </div>
                     <div className="status-actions">
                       <span className={`status-badge ${complaint.status}`}>
-                        {complaint.status === 'pending' ? '⏳' : '✅ Solved'}
+                        {complaint.status === 'pending' ? '' : '✅ Solved'}
                       </span>
-                      {complaint.status === 'pending' && (
-                        <button
-                          className="mark-solved-btn"
-                          onClick={() => handleChangeStatus(complaint._id, 'resolved')}
-                          title="Mark as solved"
-                        >
-                          Mark Solved
-                        </button>
-                      )}
                     </div>
                   </div>
 
@@ -221,6 +212,15 @@ export const ComplaintsPage = () => {
                   >
                     {expandedComplaint === complaint._id ? 'Cancel Reply' : 'Reply to Complaint'}
                   </button>
+                   {complaint.status === 'pending' && (
+                        <button
+                          className="mark-solved-btn"
+                          onClick={() => handleChangeStatus(complaint._id, 'resolved')}
+                          title="Mark as solved"
+                        >
+                          Mark Solved
+                        </button>
+                      )}
 
                   {expandedComplaint === complaint._id && (
                     <form

@@ -166,7 +166,6 @@ export const PollsPage = () => {
                 >
                   {hasVoted ? 'Already Voted' : 'Submit Vote'}
                 </button>
-                <small>Created by {poll.createdBy?.name}</small>
               </div>
             );
           })}

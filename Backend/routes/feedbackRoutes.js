@@ -4,12 +4,11 @@ const {
   getAllFeedback,
   getFeedbackByMealType,
 } = require('../controllers/feedbackController');
-const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-router.post('/', authMiddleware, submitFeedback);
-router.get('/', authMiddleware, getAllFeedback);
-router.get('/:mealType', authMiddleware, getFeedbackByMealType);
+router.post('/', submitFeedback);
+router.get('/', getAllFeedback);
+router.get('/:mealType', getFeedbackByMealType);
 
 module.exports = router;

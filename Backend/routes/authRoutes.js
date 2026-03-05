@@ -29,7 +29,6 @@ router.post('/google', async (req, res) => {
     const payload = ticket.getPayload();
     const email = payload.email;
     
-    console.log(email);
     // Check if email is allowed
     const allowed = await AllowedEmail.findOne({ email });
     if (!allowed) {
@@ -76,6 +75,12 @@ router.post('/login', async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    // Check if email is allowed
+    const allowed = await AllowedEmail.findOne({ email });
+    if (!allowed) {
+      return res.status(403).json({ message: 'Email not authorized' });
     }
 
     const user = await User.findOne({ email });

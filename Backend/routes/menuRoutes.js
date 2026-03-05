@@ -9,7 +9,6 @@ const secretaryMiddleware = require('../middleware/secretaryMiddleware');
 
 const router = express.Router();
 
-
 router.get('/', getMenu);
 router.put('/', authMiddleware,secretaryMiddleware, updateMenu);
 router.post('/email', authMiddleware, secretaryMiddleware, emailMenu);
