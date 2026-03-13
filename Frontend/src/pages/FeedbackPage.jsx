@@ -53,7 +53,7 @@ export const FeedbackPage = () => {
               ({formattedDate})
             </span>
           </label>
-          <select value={mealType} onChange={(e) => setMealType(e.target.value)}>
+          <select value={mealType} onChange={(e) => setMealType(e.target.value)} className="styled-select">
             <option value="breakfast">Breakfast</option>
             <option value="lunch">Lunch</option>
             <option value="dinner">Dinner</option>

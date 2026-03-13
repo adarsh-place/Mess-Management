@@ -107,7 +107,7 @@ export const ManagePollsPage = () => {
           <select 
             value={pollType} 
             onChange={(e) => setPollType(e.target.value)}
-            className="poll-type-select"
+            className="poll-type-select styled-select"
           >
             <option value="single">Single Choice</option>
             <option value="multiple">Multiple Choice</option>
@@ -166,7 +166,7 @@ export const ManagePollsPage = () => {
                       className="delete-btn"
                       title="Delete poll"
                     >
-                      🗑️ Delete
+                    Delete
                     </button>
                   </div>
                 </div>
@@ -186,17 +186,17 @@ export const ManagePollsPage = () => {
                     const percentage = totalVotes > 0 ? Math.round((optionVotes / totalVotes) * 100) : 0;
 
                     return (
-                      <div key={idx} className="result-item">
-                        <span className="option-name">{optionText}</span>
-                        <div className="progress-bar">
+                      <div key={idx} className="result-item poll-bar-layout poll-option-box">
+                        <div className="poll-bar-info">
+                          <span className="option-name">{optionText}</span>
+                          <span className="vote-count">{optionVotes} votes ({percentage}%)</span>
+                        </div>
+                        <div className="poll-bar-track">
                           <div
-                            className="progress-fill"
+                            className="poll-bar-fill"
                             style={{ width: `${percentage}%` }}
                           ></div>
                         </div>
-                        <span className="vote-count">
-                          {optionVotes} votes ({percentage}%)
-                        </span>
                       </div>
                     );
                   })}

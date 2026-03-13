@@ -12,13 +12,13 @@ export const SecretaryDashboardPage = () => {
       route: '/secretary/overview',
     },
     {
-      title: 'Manage Complaints',
+      title: 'Complaints',
       description: 'View and respond to student complaints',
       icon: '📝',
       route: '/secretary/complaints',
     },
     {
-      title: 'Create Polls',
+      title: 'Polls',
       description: 'Create and manage polls for students',
       icon: '🗳️',
       route: '/secretary/polls',
@@ -30,7 +30,7 @@ export const SecretaryDashboardPage = () => {
       route: '/secretary/feedback',
     },
     {
-      title: 'Manage Menu',
+      title: 'Menu',
       description: 'Create and manage mess menu',
       icon: '🍽️',
       route: '/secretary/menu',
@@ -42,7 +42,7 @@ export const SecretaryDashboardPage = () => {
       route: '/secretary/notices',
     },
     {
-      title: 'Manage Students',
+      title: 'Students',
       description: 'Add or Remove students',
       icon: '📢',
       route: '/manage-students',

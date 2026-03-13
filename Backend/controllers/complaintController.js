@@ -136,7 +136,7 @@ exports.addReply = async (req, res) => {
     const secretary = await User.findById(req.userId);
     if (user.role === 'secretary' && student) {
       const { sendReplyNotification } = require('../utils/emailService');
-      await sendReplyNotification(student.email, {
+      sendReplyNotification(student.email, {
         studentName: student.name,
         secretaryName: secretary.name,
         message,

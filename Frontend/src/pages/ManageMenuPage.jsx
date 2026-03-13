@@ -135,7 +135,8 @@ export const ManageMenuPage = () => {
     <div className="secretary-container">
       <h1>Manage Menu</h1>
       {message && <div className="message">{message}</div>}
-      <table className="menu-table" style={{ marginBottom: 32, width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+      <div className="mess-timings-box">
+        <table className="menu-table" style={{ marginBottom: 0, width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
         <thead>
           <tr>
             <th style={{ width: '120px' }}>Day</th>
@@ -146,13 +147,13 @@ export const ManageMenuPage = () => {
           <tr>
             <td></td>
             <td>
-              <input type="text" value={timings[0]} onChange={e => setTimings([e.target.value, timings[1], timings[2]])} style={{ width: '90%' }} />
+              <input type="text" value={timings[0]} onChange={e => setTimings([e.target.value, timings[1], timings[2]])} className="menu-items-input" />
             </td>
             <td>
-              <input type="text" value={timings[1]} onChange={e => setTimings([timings[0], e.target.value, timings[2]])} style={{ width: '90%' }} />
+              <input type="text" value={timings[1]} onChange={e => setTimings([timings[0], e.target.value, timings[2]])} className="menu-items-input" />
             </td>
             <td>
-              <input type="text" value={timings[2]} onChange={e => setTimings([timings[0], timings[1], e.target.value])} style={{ width: '90%' }} />
+              <input type="text" value={timings[2]} onChange={e => setTimings([timings[0], timings[1], e.target.value])} className="menu-items-input" />
             </td>
           </tr>
         </thead>
@@ -166,12 +167,13 @@ export const ManageMenuPage = () => {
             </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
       <div className="edit-menu-form" style={{ marginBottom: 32, padding: 16, border: '1px solid #ccc', borderRadius: 8, maxWidth: 600 }}>
         <h3>Change Menu</h3>
         <div style={{ marginBottom: 8 }}>
           <label>Day:&nbsp;</label>
-          <select value={editDay} onChange={handleEditDayChange}>
+          <select value={editDay} onChange={handleEditDayChange} className="styled-select">
             <option value="">Select Day</option>
             {days.map(day => (
               <option key={day} value={day}>{day}</option>
@@ -182,7 +184,7 @@ export const ManageMenuPage = () => {
           <>
             <div style={{ marginBottom: 8 }}>
               <label>Meal:&nbsp;</label>
-              <select value={editMeal} onChange={handleMealChange}>
+              <select value={editMeal} onChange={handleMealChange} className="styled-select">
                 <option value="breakfast">Breakfast</option>
                 <option value="lunch">Lunch</option>
                 <option value="dinner">Dinner</option>
@@ -190,14 +192,14 @@ export const ManageMenuPage = () => {
             </div>
             <div style={{ marginBottom: 8 }}>
               <label>Menu Items:&nbsp;</label>
-              <input type="text" value={editValue} onChange={handleEditValueChange} style={{ width: 300 }} />
+              <input type="text" value={editValue} onChange={handleEditValueChange} className="menu-items-input" />
             </div>
-            <button type="button" onClick={() => setEditDay('')}>Cancel</button>
+            <button type="button" onClick={() => setEditDay('')} className="menu-action-btn cancel">Cancel</button>
           </>
         )}
       </div>
-      <button type="button" onClick={handleEditSave} style={{ marginRight: 8 }}>Save</button>
-      <button type="button" onClick={handleNotifyEveryone} disabled={loading} style={{ marginBottom: 24 }}>
+      <button type="button" onClick={handleEditSave} className="menu-action-btn save">Save</button>
+      <button type="button" onClick={handleNotifyEveryone} disabled={loading} className="menu-action-btn notify">
         {loading ? 'Notifying...' : 'Notify Everyone'}
       </button>
       {/* <form onSubmit={handleSubmit} className="secretary-form">

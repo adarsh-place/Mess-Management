@@ -62,20 +62,16 @@ export const SecretaryOverviewPage = () => {
           <h3>Active Polls</h3>
           <div className="stat-number">{polls.length}</div>
         </div>
-        <div className="stat-card">
-          <h3>Student Feedback</h3>
-          <div className="stat-number">{feedbacks.length}</div>
-        </div>
       </div>
 
       <h2>Recent Complaints (Past 7 Days)</h2>
       {loading ? (
         <p>Loading...</p>
       ) : getRecentComplaints().length > 0 ? (
-        <div className="complaints-list">
+        <div className="notices-list">
           {getRecentComplaints().slice(0, 5).map((complaint) => (
             <div key={complaint._id} className="complaint-item">
-              <h4>From {complaint.studentId?.name}</h4>
+              <h4>From: {complaint.studentId?.name} ({complaint.studentId?.email})</h4>
               <p>{complaint.text}</p>
               <span className={`status ${complaint.status}`}>{complaint.status}</span>
               <small>{new Date(complaint.createdAt).toLocaleDateString()}</small>

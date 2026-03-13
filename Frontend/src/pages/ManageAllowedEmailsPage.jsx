@@ -9,6 +9,7 @@ export const ManageAllowedEmailsPage = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
 
   // Fetch allowed emails on mount
   useEffect(() => {
@@ -56,33 +57,78 @@ export const ManageAllowedEmailsPage = () => {
     }
   };
 
+  // Filtered emails by search prefix
+  const filteredEmails = search
+    ? allowedEmails.filter(item => item.email.toLowerCase().startsWith(search.toLowerCase()))
+    : allowedEmails;
+
+  // Bulk delete handler
+  const handleDeleteAllPrefix = async () => {
+    if (!search) return;
+    if (!window.confirm(`Delete all emails starting with '${search}'?`)) return;
+    setLoading(true);
+    setMessage('');
+    setError('');
+    try {
+      // Delete all matching emails
+      const idsToDelete = filteredEmails.map(item => item._id).filter(Boolean);
+      await Promise.all(idsToDelete.map(id => axios.delete(`${API_URL}/${id}`)));
+      setMessage('All matching emails deleted!');
+      fetchAllowedEmails();
+    } catch (err) {
+      setError('Failed to delete emails');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="auth-container">
       <div className="auth-card">
         <h2>Manage Allowed Emails</h2>
         <form onSubmit={handleAddEmail} style={{ marginBottom: 24 }}>
           <div className="form-group">
-            <label>Email:</label>
             <input
+              placeholder="Enter email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              style={{ marginBottom: 0 }}
             />
           </div>
-          <button type="submit" disabled={loading}>
+          <button type="submit" disabled={loading}
+          style={{ marginTop: 0 }}>
             {loading ? 'Adding...' : 'Add Email'}
           </button>
         </form>
+
+        <h3 style={{ marginBottom: 16 }}>Currently Allowed Emails</h3>
+        <div style={{ marginBottom: 16 }}>
+          <input
+            type="text"
+            placeholder="Search emails by prefix..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="auth-search-input"
+            style={{ marginBottom: 8 }}
+          />
+          <button
+            type="button"
+            onClick={handleDeleteAllPrefix}
+            disabled={loading || !search || filteredEmails.length === 0}
+            style={{ width: '100%', marginBottom: 8 }}
+          >
+            Delete All Matching
+          </button>
+        </div>
         {message && <div style={{ color: 'green', marginBottom: 8 }}>{message}</div>}
         {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
-        <h3>Currently Allowed Emails</h3>
         <ul>
-          {allowedEmails.map((item) => (
+          {filteredEmails.map((item) => (
             <li key={item._id || item.email} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {item.email}
               <button
-                style={{ marginLeft: 8, color: 'white', background: 'red', border: 'none', borderRadius: 4, cursor: 'pointer', padding: '2px 8px' }}
                 onClick={() => handleRemoveEmail(item._id)}
                 disabled={loading}
               >

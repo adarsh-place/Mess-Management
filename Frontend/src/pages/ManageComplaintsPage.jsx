@@ -10,6 +10,7 @@ export const ManageComplaintsPage = () => {
   const [replyMessage, setReplyMessage] = useState('');
   const [replyLoading, setReplyLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [responseMsg, setResponseMsg] = useState('');
 
   useEffect(() => {
     fetchComplaints();
@@ -39,9 +40,11 @@ export const ManageComplaintsPage = () => {
         message: replyMessage,
       });
       //alert('Reply sent successfully to the student!');
+      setResponseMsg('Reply sent successfully to the student!');
       setReplyMessage('');
       setExpandedComplaint(null);
       fetchComplaints();
+      setTimeout(() => setResponseMsg(''), 3000);
     } catch (error) {
       console.error('Error sending reply:', error);
       alert(error.response?.data?.message || 'Error sending reply');
@@ -56,16 +59,18 @@ export const ManageComplaintsPage = () => {
 
       <div style={{ marginBottom: 16 }}>
         <label htmlFor="statusFilter">Filter by Status: </label>
-        <select
-          id="statusFilter"
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-        >
+          <select
+            id="statusFilter"
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="complaint-filter-select styled-select"
+          >
           <option value="all">All</option>
           <option value="pending">Pending</option>
           <option value="resolved">Solved</option>
         </select>
       </div>
+      {responseMsg && <div className="message">{responseMsg}</div>}
       {loading ? (
         <p>Loading...</p>
       ) : complaints.length > 0 ? (
@@ -75,7 +80,7 @@ export const ManageComplaintsPage = () => {
             .map((complaint) => (
             <div key={complaint._id} className="complaint-item">
               <div className="complaint-header">
-                <h4>From {complaint.studentId?.name}</h4>
+                <h4>From: {complaint.studentId?.name} ({complaint.studentId?.email})</h4>
                 <span className={`status ${complaint.status}`}>{complaint.status}</span>
               </div>
               <p>{complaint.text}</p>

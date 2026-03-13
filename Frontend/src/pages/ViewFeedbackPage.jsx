@@ -127,6 +127,7 @@ export const ViewFeedbackPage = () => {
           id="dateFilter"
           value={selectedDate}
           onChange={e => setSelectedDate(e.target.value)}
+          className="styled-select"
         >
           {last7Days.map(day => (
             <option key={day.value} value={day.value}>{day.label}</option>
@@ -140,6 +141,7 @@ export const ViewFeedbackPage = () => {
           id="mealFilter"
           value={filter} 
           onChange={(e) => setFilter(e.target.value)}
+          className="styled-select"
         >
           <option value="all">All Meals</option>
           <option value="breakfast">Breakfast</option>

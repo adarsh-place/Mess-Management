@@ -126,10 +126,11 @@ export const ComplaintsPage = () => {
         <div className="complaints-history">
           <div style={{ marginBottom: 16 }}>
             <label htmlFor="statusFilter">Filter by Status: </label>  
-            <select
-              id="statusFilter"
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
+              <select
+                id="statusFilter"
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+                className="complaint-filter-select styled-select"
             >
               <option value="all">All</option>
               <option value="pending">Pending</option>

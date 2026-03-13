@@ -11,11 +11,27 @@
   text-align: center;
 }
 
+.polls-section h4{
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.polls-section h2{
+  text-align: center;
+  margin-bottom: 30px;
+}
+
 .polls-list {
   gap: 20px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+.poll-header-actions{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .poll-card {
@@ -42,6 +58,12 @@
   color: white;
   padding: 5px 12px;
   border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.delete-btn{
   font-size: 12px;
   margin-bottom: 15px;
   font-weight: 600;
