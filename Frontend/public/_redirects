@@ -1,28 +1,12 @@
-/*
-  Redirect all requests to index.html for client-side routing
-*/
-/* Catch-all rule */
-/* This works for Render static site hosting */
-/* Place this file in the Frontend/public directory */
-/*
-  The order matters: place specific rules above the catch-all if needed
-*/
-/* Catch-all: send everything to index.html */
-/*
-  /dashboard   /index.html   200
-  /profile     /index.html   200
-  ...
-*/
-/* The following rule redirects all paths to index.html */
-/*
-  /*    /index.html   200
-*/
-/* Render uses this file for static hosting */
-/* Actual rule: */
-/*
-  /*    /index.html   200
-*/
-/* Remove comments if needed, but Render supports comments */
-/*
-  /*    /index.html   200
-*/
+ /dashboard           /index.html   200
+ /polls               /index.html   200
+ /complaints          /index.html   200
+ /feedback            /index.html   200
+ /menu                /index.html   200
+ /secretary/overview  /index.html   200
+ /secretary/complaints /index.html  200
+ /secretary/polls     /index.html   200
+ /secretary/feedback  /index.html   200
+ /secretary/menu      /index.html   200
+ /secretary/notices   /index.html   200
+ /*                   /index.html   200
