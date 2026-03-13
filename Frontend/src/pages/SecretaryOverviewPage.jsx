@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Dashboard.css';
 import '../styles/Secretary.css';
+import { backend } from "../../constant.js"; 
 
 export const SecretaryOverviewPage = () => {
   const [complaints, setComplaints] = useState([]);
@@ -33,10 +34,10 @@ export const SecretaryOverviewPage = () => {
     setLoading(true);
     try {
       const [complaintRes, noticeRes, pollRes, feedbackRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/complaints'),
-        axios.get('http://localhost:5000/api/notices'),
-        axios.get('http://localhost:5000/api/polls'),
-        axios.get('http://localhost:5000/api/feedback'),
+        axios.get(`${backend}/api/complaints`),
+        axios.get(`${backend}/api/notices`),
+        axios.get(`${backend}/api/polls`),
+        axios.get(`${backend}/api/feedback`),
       ]);
       setComplaints(complaintRes.data);
       setNotices(noticeRes.data);
@@ -56,11 +57,11 @@ export const SecretaryOverviewPage = () => {
       <div className="stats-grid">
         <div className="stat-card">
           <h3>Total Complaints</h3>
-          <div className="stat-number">{complaints.length}</div>
+          <div className="stat-number">{loading ? '-' : complaints.length}</div>
         </div>
         <div className="stat-card">
           <h3>Active Polls</h3>
-          <div className="stat-number">{polls.length}</div>
+          <div className="stat-number">{loading ? '-' : polls.length}</div>
         </div>
       </div>
 

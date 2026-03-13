@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import "../styles/Polls.css";
+import { backend } from "../../constant.js"; // Import backend URL from config
 
 export const PollsPage = () => {
   const { user } = useContext(AuthContext);
@@ -10,11 +11,13 @@ export const PollsPage = () => {
   const [selectedOptions, setSelectedOptions] = useState({});
   const [votedPolls, setVotedPolls] = useState(new Set());
 
+  console.log(backend);
+
   useEffect(() => {
     const fetchPolls = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("http://localhost:5000/api/polls");
+        const response = await axios.get(`${backend}/api/polls`);
         setPolls(response.data);
         
         // Initialize selected options for each poll
@@ -83,7 +86,7 @@ export const PollsPage = () => {
     }
 
     try {
-      const voteRes = await axios.post("http://localhost:5000/api/polls/vote", {
+      const voteRes = await axios.post(`${backend}/api/polls/vote`, {
         pollId,
         selectedOptions: Array.isArray(options) ? options : [options],
       });
@@ -93,7 +96,7 @@ export const PollsPage = () => {
       if (voteRes.data?.poll) {
         setPolls(prev => prev.map(p => p._id === voteRes.data.poll._id ? voteRes.data.poll : p));
       } else {
-        const response = await axios.get("http://localhost:5000/api/polls");
+        const response = await axios.get(`${backend}/api/polls`);
         setPolls(response.data);
       }
 

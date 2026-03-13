@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Dashboard.css';
 import '../styles/Secretary.css';
+import { backend } from '../../constant.js';
 
 export const ManageComplaintsPage = () => {
   const [complaints, setComplaints] = useState([]);
@@ -19,7 +20,7 @@ export const ManageComplaintsPage = () => {
   const fetchComplaints = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/complaints');
+      const response = await axios.get(`${backend}/api/complaints`);
       setComplaints(response.data);
     } catch (error) {
       console.error('Error fetching complaints:', error);
@@ -36,7 +37,7 @@ export const ManageComplaintsPage = () => {
 
     setReplyLoading(true);
     try {
-      await axios.post(`http://localhost:5000/api/complaints/${complaintId}/reply`, {
+      await axios.post(`${backend}/api/complaints/${complaintId}/reply`, {
         message: replyMessage,
       });
       //alert('Reply sent successfully to the student!');

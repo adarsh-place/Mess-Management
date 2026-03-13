@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Secretary.css';
+import { backend } from '../../constant.js'; // Update import to use constant.js
 
 export const ManageMenuPage = () => {
   const [menu, setMenu] = useState({});
@@ -27,7 +28,7 @@ export const ManageMenuPage = () => {
     try {
       setMessage('Sending notification to everyone!');
       setLoading(false);
-      await axios.post('http://localhost:5000/api/menu/email');
+      await axios.post(`${backend}/api/menu/email`);
       setTimeout(() => setMessage(''), 3000);
       setMessage('Notifications sent successfully');
     } catch (err) {
@@ -41,7 +42,7 @@ export const ManageMenuPage = () => {
     setLoading(true);
     try {
       // Send only timings to backend (keep menu unchanged)
-      await axios.put('http://localhost:5000/api/menu/timings', {timings
+      await axios.put(`${backend}/api/menu/timings`, {timings
       });
       setMessage('Timings updated!');
       setTimeout(() => setMessage(''), 3000);
@@ -56,7 +57,7 @@ export const ManageMenuPage = () => {
   const fetchMenu = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5000/api/menu');
+      const res = await axios.get(`${backend}/api/menu`);
       const data = res.data;
       if (data && data.days) {
         if (data.timings && Array.isArray(data.timings)) {
@@ -116,7 +117,7 @@ export const ManageMenuPage = () => {
           (day === editDay && editMeal === 'dinner') ? editValue : menu[day]?.dinner || ''
         ];
       });
-      await axios.put('http://localhost:5000/api/menu', {
+      await axios.put(`${backend}/api/menu`, {
         days: daysObj,
         timings
       });
@@ -135,6 +136,7 @@ export const ManageMenuPage = () => {
     <div className="secretary-container">
       <h1>Manage Menu</h1>
       {message && <div className="message">{message}</div>}
+      {loading && <div>Loading...</div>}
       <div className="mess-timings-box">
         <table className="menu-table" style={{ marginBottom: 0, width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
         <thead>

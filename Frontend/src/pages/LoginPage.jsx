@@ -75,7 +75,7 @@ export const LoginPage = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>Login</h2>
+        <h2>Mess Login</h2>
         {error && <div className="error-message">{String(error)}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">

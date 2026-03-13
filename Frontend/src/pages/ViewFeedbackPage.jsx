@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Feedback.css';
+import { backend } from '../../constant.js'; // Import the backend constant
 
 function getLast7Days() {
   const days = [];
@@ -26,7 +27,7 @@ export const ViewFeedbackPage = () => {
     const fetchFeedbacks = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/feedback');
+        const response = await axios.get(`${backend}/api/feedback`);
         console.log(response.data);
         const feedbacksRaw = response.data;
         // Fetch student details for each feedback if not already populated
@@ -34,7 +35,7 @@ export const ViewFeedbackPage = () => {
           feedbacksRaw.map(async (fb) => {
             if (fb.studentId && typeof fb.studentId === 'string') {
               try {
-                const userRes = await axios.get(`http://localhost:5000/api/users/${fb.studentId}`);
+                const userRes = await axios.get(`${backend}/api/users/${fb.studentId}`);
                 return { ...fb, studentUser: userRes.data };
               } catch {
                 return { ...fb, studentUser: null };

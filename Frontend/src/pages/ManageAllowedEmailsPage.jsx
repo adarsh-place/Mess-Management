@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { backend } from '../../constant.js'; // Adjust the import based on your project structure
 
-const API_URL = 'http://localhost:5000/api/allowed-emails';
+const API_URL = `${backend}/api/allowed-emails`;
 
 export const ManageAllowedEmailsPage = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export const ManageAllowedEmailsPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [isFetching, setIsFetching] = useState(true);
 
   // Fetch allowed emails on mount
   useEffect(() => {
@@ -18,11 +20,13 @@ export const ManageAllowedEmailsPage = () => {
 
   const fetchAllowedEmails = async () => {
     try {
+      setIsFetching(true);
       const res = await axios.get(API_URL);
       setAllowedEmails(res.data);
     } catch (err) {
       setError('Failed to fetch allowed emails');
     }
+    setIsFetching(false);
   };
 
   const handleAddEmail = async (e) => {
@@ -122,13 +126,15 @@ export const ManageAllowedEmailsPage = () => {
             Delete All Matching
           </button>
         </div>
+        {isFetching && <div>Fetching...</div>}
         {message && <div style={{ color: 'green', marginBottom: 8 }}>{message}</div>}
         {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
         <ul>
           {filteredEmails.map((item) => (
-            <li key={item._id || item.email} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <li key={item._id || item.email} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               {item.email}
               <button
+                style={{ maxWidth: '100px'}}
                 onClick={() => handleRemoveEmail(item._id)}
                 disabled={loading}
               >

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Dashboard.css';
+import { backend } from "../../constant.js";
 
 export const StudentDashboard = () => {
   const [notices, setNotices] = useState([]);
@@ -10,7 +11,7 @@ export const StudentDashboard = () => {
     const fetchNotices = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/notices');
+        const response = await axios.get(`${backend}/api/notices`);
         setNotices(response.data);
       } catch (error) {
         console.error('Error fetching notices:', error);

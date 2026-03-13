@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import '../styles/Feedback.css';
+import { backend } from '../../constant.js';
 
 export const FeedbackPage = () => {
   const [mealType, setMealType] = useState('breakfast');
@@ -13,7 +14,7 @@ export const FeedbackPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/feedback', {
+      await axios.post(`${backend}/api/feedback`, {
         mealType,
         rating: parseInt(rating),
         description,

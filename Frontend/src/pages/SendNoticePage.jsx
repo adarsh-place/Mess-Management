@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import '../styles/Secretary.css';
+import { backend } from "../../constant.js";
 
 export const SendNoticePage = () => {
   const [title, setTitle] = useState('');
@@ -12,7 +13,7 @@ export const SendNoticePage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/notices', {
+      await axios.post(`${backend}/api/notices`, {
         title,
         message,
       });

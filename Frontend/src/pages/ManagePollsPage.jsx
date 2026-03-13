@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Secretary.css';
 import '../styles/Polls.css';
+import { backend } from '../../constant.js';
 
 export const ManagePollsPage = () => {
   const [polls, setPolls] = useState([]);
@@ -19,7 +20,7 @@ export const ManagePollsPage = () => {
   const fetchPolls = async () => {
     setDataLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/polls');
+      const response = await axios.get(`${backend}/api/polls`);
       setPolls(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching polls:', error);
@@ -53,7 +54,7 @@ export const ManagePollsPage = () => {
         setMessage('Please fill in all fields');
         return;
       }
-      await axios.post('http://localhost:5000/api/polls', {
+      await axios.post(`${backend}/api/polls`, {
         question,
         pollType,
         options: options.filter(opt => opt.trim() !== ''),
@@ -74,7 +75,7 @@ export const ManagePollsPage = () => {
   const handleDeletePoll = async (pollId) => {
     if (window.confirm('Are you sure you want to delete this poll? This action cannot be undone.')) {
       try {
-        await axios.delete(`http://localhost:5000/api/polls/${pollId}`);
+        await axios.delete(`${backend}/api/polls/${pollId}`);
         setMessage('Poll deleted successfully!');
         fetchPolls(); // Refresh the list
         setTimeout(() => setMessage(''), 3000);

@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { backend } from '../../constant.js';
 
 export const AuthContext = createContext();
 
@@ -31,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     const googleLogin = async (idToken) => {
       setLoading(true);
       try {
-        const response = await axios.post('http://localhost:5000/api/auth/google', { idToken });
+        const response = await axios.post(`${backend}/api/auth/google`, { idToken });
         setToken(response.data.token);
         setUser(response.data.user);
         localStorage.setItem('token', response.data.token);
@@ -75,7 +76,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post(`${backend}/api/auth/login`, {
         email,
         password,
       });

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Complaints.css';
 
+import { backend } from '../../constant.js';
+
 export const ComplaintsPage = () => {
   const [text, setText] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -25,7 +27,7 @@ export const ComplaintsPage = () => {
   const fetchMyComplaints = async () => {
     setComplaintsLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/complaints/my-complaints');
+      const response = await axios.get(`${backend}/api/complaints/my-complaints`);
       setComplaints(response.data);
     } catch (error) {
       console.error('Error fetching complaints:', error);
@@ -39,7 +41,7 @@ export const ComplaintsPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/complaints', {
+      await axios.post(`${backend}/api/complaints`, {
         text,
         imageUrl,
       });
@@ -58,7 +60,7 @@ export const ComplaintsPage = () => {
 
   const handleChangeStatus = async (complaintId, newStatus) => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/complaints/${complaintId}`, {
+      const response = await axios.put(`${backend}/api/complaints/${complaintId}`, {
         status: newStatus,
       });
       setMessage('Complaint status updated successfully!');
