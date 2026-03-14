@@ -22,6 +22,7 @@ const pollRoutes = require('./routes/pollRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const menuRoutes = require('./routes/menuRoutes');
+const menuFeedbackRoutes = require('./routes/menuFeedbackRoutes');
 const noticeRoutes = require('./routes/noticeRoutes');
 const allowedEmailsRoutes = require('./routes/allowedEmailsRoutes');
 const secretaryMiddleware = require('./middleware/secretaryMiddleware');
@@ -38,6 +39,7 @@ app.use('/api/polls',authMiddleware, pollRoutes);
 app.use('/api/complaints',authMiddleware, complaintRoutes);
 app.use('/api/feedback',authMiddleware, feedbackRoutes);
 app.use('/api/menu', menuRoutes);
+app.use('/api/menu-feedback', menuFeedbackRoutes);
 app.use('/api/notices',authMiddleware, noticeRoutes);
 app.use('/api/allowed-emails',authMiddleware, allowedEmailsRoutes);
 
