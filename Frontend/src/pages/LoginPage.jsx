@@ -73,35 +73,13 @@ export const LoginPage = () => {
   }, [googleLogin, navigate]);
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Mess Login</h2>
-        {error && <div className="error-message">{String(error)}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Email:</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Password:</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-        <div style={{ margin: '32px 0 0 0', textAlign: 'center' }}>
-          <div style={{ marginBottom: '8px', fontWeight: 500, color: '#555' }}>or</div>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #f7fafc 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: '#fff', boxShadow: '0 8px 32px rgba(102,126,234,0.18)', borderRadius: 18, padding: '40px 32px', maxWidth: 400, width: '100%', textAlign: 'center' }}>
+        <h2 style={{ fontSize: '2.2rem', fontWeight: 700, color: '#667eea', marginBottom: 8 }}>BHR IIT Bhubaneswar</h2>
+        <h3 style={{ fontSize: '1.4rem', fontWeight: 600, color: '#333', marginBottom: 24 }}>Mess Login</h3>
+        {error && <div style={{ color: '#f56565', fontWeight: 600, marginBottom: 16 }}>{String(error)}</div>}
+        
+        <div style={{ margin: '0 0 0 0', textAlign: 'center' }}>
           <div ref={googleBtnRef} style={{ display: 'inline-block', minHeight: 40 }}></div>
           {googleBtnError && (
             <div style={{ color: 'red', marginTop: 8 }}>{googleBtnError}</div>
