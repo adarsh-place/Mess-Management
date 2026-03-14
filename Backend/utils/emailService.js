@@ -1,51 +1,59 @@
-const nodemailer = require('nodemailer');
 
-// Create transporter
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  connectionTimeout: 10000, // 10 seconds
-  socketTimeout: 10000, // 10 seconds
-});
+const { google } = require('googleapis');
+const OAuth2 = google.auth.OAuth2;
+
+const oauth2Client = new OAuth2(
+  process.env.GMAIL_CLIENT_ID,
+  process.env.GMAIL_CLIENT_SECRET,
+  'https://developers.google.com/oauthplayground' // redirect URL
+);
+oauth2Client.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN });
+
+const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
 // Function to send menu PDF to all members
 const emailMenuPDF = async (emails, pdfBuffer, html) => {
   const subject = 'Mess Menu Timetable';
   const htmlBody = html || '<h2>Mess Menu Timetable</h2><p>Find attached the current menu timetable PDF.</p>';
-
-  // Send all emails simultaneously
-  const emailPromises = emails.map(email => transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject,
-      html: htmlBody,
-      attachments: [{ filename: 'menu.pdf', content: pdfBuffer }]
-    }));
-  
-  // Wait for all to finish (or use Promise.allSettled to ignore individual fails)
+  const emailPromises = emails.map(email => sendEmail(email, subject, htmlBody, pdfBuffer));
   await Promise.allSettled(emailPromises);
 };
 
-// Function to send email
-const sendEmail = async (to, subject, html) => {
+// Function to send email using Gmail API
+const sendEmail = async (to, subject, html, pdfBuffer) => {
   try {
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to,
-      subject,
+    let messageParts = [
+      `From: ${process.env.EMAIL_USER}`,
+      `To: ${to}`,
+      `Subject: ${subject}`,
+      'MIME-Version: 1.0',
+      'Content-Type: multipart/mixed; boundary="boundary"',
+      '',
+      '--boundary',
+      'Content-Type: text/html; charset=UTF-8',
+      '',
       html,
-    };
-
-    await transporter.sendMail(mailOptions);
+    ];
+    if (pdfBuffer) {
+      const pdfBase64 = pdfBuffer.toString('base64');
+      messageParts.push('--boundary');
+      messageParts.push('Content-Type: application/pdf; name="menu.pdf"');
+      messageParts.push('Content-Disposition: attachment; filename="menu.pdf"');
+      messageParts.push('Content-Transfer-Encoding: base64');
+      messageParts.push('');
+      messageParts.push(pdfBase64);
+    }
+    messageParts.push('--boundary--');
+    const rawMessage = Buffer.from(messageParts.join('\r\n')).toString('base64').replace(/\+/g, '-').replace(/\//g, '_');
+    await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: rawMessage,
+      },
+    });
     console.log(`Email sent to ${to}`);
   } catch (error) {
     console.error('Error sending email:', error.message);
-    // Don't throw - allow app to continue even if email fails
     return false;
   }
 };

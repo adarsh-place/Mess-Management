@@ -236,7 +236,7 @@ export const ComplaintsPage = () => {
                         }
                         setReplyLoading((prev) => ({ ...prev, [complaint._id]: true }));
                         try {
-                          await axios.post(`http://localhost:5000/api/complaints/${complaint._id}/reply`, {
+                          await axios.post(`${backend}/api/complaints/${complaint._id}/reply`, {
                             message: replyMessage,
                           });
                           setComplaints((prev) => prev.map((c) =>
