@@ -1,24 +1,10 @@
-// Function to send menu PDF to all members
-const emailMenuPDF = async (emails, pdfBuffer, html) => {
-  const subject = 'Mess Menu Timetable';
-  const htmlBody = html || '<h2>Mess Menu Timetable</h2><p>Find attached the current menu timetable PDF.</p>';
-  for (const email of emails) {
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject,
-      html: htmlBody,
-      attachments: [{ filename: 'menu.pdf', content: pdfBuffer }]
-    });
-  }
-};
 const nodemailer = require('nodemailer');
 
 // Create transporter
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // use TLS
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -26,6 +12,24 @@ const transporter = nodemailer.createTransport({
   connectionTimeout: 10000, // 10 seconds
   socketTimeout: 10000, // 10 seconds
 });
+
+// Function to send menu PDF to all members
+const emailMenuPDF = async (emails, pdfBuffer, html) => {
+  const subject = 'Mess Menu Timetable';
+  const htmlBody = html || '<h2>Mess Menu Timetable</h2><p>Find attached the current menu timetable PDF.</p>';
+
+  // Send all emails simultaneously
+  const emailPromises = emails.map(email => transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject,
+      html: htmlBody,
+      attachments: [{ filename: 'menu.pdf', content: pdfBuffer }]
+    }));
+  
+  // Wait for all to finish (or use Promise.allSettled to ignore individual fails)
+  await Promise.allSettled(emailPromises);
+};
 
 // Function to send email
 const sendEmail = async (to, subject, html) => {
@@ -70,9 +74,11 @@ const sendNoticeToMembers = async (emails, noticeDetails) => {
     <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
   `;
 
-  for (const email of emails) {
-    await sendEmail(email, subject, html);
-  }
+  // Send all emails simultaneously
+  const emailPromises = emails.map(email => sendEmail(email, subject, html));
+  
+  // Wait for all to finish (or use Promise.allSettled to ignore individual fails)
+  await Promise.allSettled(emailPromises);
 };
 
 // Function to send menu update notification
@@ -85,9 +91,11 @@ const sendMenuUpdateNotification = async (emails, menuDetails) => {
     <p><strong>Dinner:</strong> ${menuDetails.dinner.join(', ')}</p>
   `;
 
-  for (const email of emails) {
-    await sendEmail(email, subject, html);
-  }
+  // Send all emails simultaneously
+  const emailPromises = emails.map(email => sendEmail(email, subject, html));
+  
+  // Wait for all to finish (or use Promise.allSettled to ignore individual fails)
+  await Promise.allSettled(emailPromises);
 };
 
 // Function to send complaint reply notification to student
