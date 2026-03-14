@@ -68,16 +68,16 @@ export const ManageMenuPage = () => {
   }, []);
 
     // Notify everyone after menu update
-  const handleNotifyEveryone = async () => {
+  const handleNotifyMe = async () => {
     setLoading(true);
     try {
-      setMessage('Sending notification to everyone!');
-      setLoading(false);
+      setMessage('Sending Mail...');
       await axios.post(`${backend}/api/menu/email`);
-      setTimeout(() => setMessage(''), 3000);
-      setMessage('Notifications sent successfully');
+      setLoading(false);
+      setMessage('Menu mail sent successfully!');
+      setTimeout(() => setMessage(''), 4000);
     } catch (err) {
-      setMessage('Error sending notification');
+      setMessage('Error sending mail');
     } finally {
     }
   };
@@ -347,13 +347,15 @@ export const ManageMenuPage = () => {
       </div>
       {/* Save button moved beside Cancel inside Change Menu */}
       <div style={{ display: 'flex', gap: 12 }}>
-        <button type="button" onClick={handleNotifyEveryone} disabled={loading} className="menu-action-btn notify">
-          {loading ? 'Notifying...' : 'Notify Everyone'}
+        <button type="button" onClick={handleEditSave} className="menu-action-btn save">Save</button>
+        <button type="button" onClick={handleNotifyMe} disabled={loading} className="menu-action-btn notify">
+          {loading ? 'Sending...' : 'Send Mail to Me'}
         </button>
         <button type="button" onClick={handleFinalize} className="menu-action-btn finalize" style={{ background: '#f56565', color: '#fff', fontWeight: 600 }}>
           Finalize
         </button>
       </div>
+      {message && <div className="message">{message}</div>}
       {/* <form onSubmit={handleSubmit} className="secretary-form">
         <div className="form-group">
           <label>Date:</label>

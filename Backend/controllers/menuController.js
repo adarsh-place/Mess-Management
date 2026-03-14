@@ -13,7 +13,7 @@ exports.emailMenu = async (req, res) => {
     const pdfBuffer = await generateMenuPDF(days, timings);
     
     const allUsers = await User.find({ role: 'student' });
-    const emails = allUsers.map(u => u.email);
+    const email = process.env.EMAIL_USER;
     
     // Add timings row below headers
     // const timings = menu[0].timings || ["", "", ""];
@@ -28,7 +28,7 @@ exports.emailMenu = async (req, res) => {
     let html = '';
     // Send PDF and HTML table to all
     console.log(html);
-    await emailMenuPDF(emails, pdfBuffer, html);
+    await emailMenuPDF(email, pdfBuffer, html);
     res.status(200).json({ message: 'Menu PDF emailed to everyone!' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

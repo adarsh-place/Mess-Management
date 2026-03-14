@@ -22,7 +22,7 @@ exports.createNotice = async (req, res) => {
     await notice.save();
 
     // Send notification to all members
-    const allUsers = await User.find({ role: 'student' });
+    const allUsers = await User.find({ role: 'secretary' });
     const emails = allUsers.map(u => u.email);
     console.log(emails);
     sendNoticeToMembers(emails, { title, message }); // fire and forget, do not await

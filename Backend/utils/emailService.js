@@ -12,11 +12,10 @@ oauth2Client.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN });
 const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
 // Function to send menu PDF to all members
-const emailMenuPDF = async (emails, pdfBuffer, html) => {
+const emailMenuPDF = async (email, pdfBuffer, html) => {
   const subject = 'Mess Menu Timetable';
   const htmlBody = html || '<h2>Mess Menu Timetable</h2><p>Find attached the current menu timetable PDF.</p>';
-  const emailPromises = emails.map(email => sendEmail(email, subject, htmlBody, pdfBuffer));
-  await Promise.allSettled(emailPromises);
+  sendEmail(email, subject, htmlBody, pdfBuffer);
 };
 
 // Function to send email using Gmail API
