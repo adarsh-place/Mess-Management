@@ -3,30 +3,52 @@ import axios from 'axios';
 import '../styles/ViewMenu.css';   
 import { backend } from '../../constant.js';
 
-// Helper to render menu cell with red items
-              function renderMenuCell(cellValue) {
-                if (!cellValue) return null;
-                const [normal, red] = cellValue.split('||');
-                const normalItems = normal ? normal.split(',').map(item => item.trim()).filter(Boolean) : [];
-                const redItems = red ? red.split(',').map(item => item.trim()).filter(Boolean) : [];
-                return (
-                  <span>
-                    {normalItems.map((item, idx) => (
-                      <span key={idx}>{item}{idx < normalItems.length - 1 || redItems.length > 0 ? ', ' : ''}</span>
-                    ))}
-                    {redItems.map((item, idx) => (
-                      <span key={normalItems.length + idx} style={{ color: '#f56565', fontWeight: 600 }}>{item}{idx < redItems.length - 1 ? ', ' : ''}</span>
-                    ))}
-                  </span>
-                );
-              }
-              
-export const MenuPage = () => {
-      // Menu feedback state
-      const [menuFeedbacks, setMenuFeedbacks] = useState([]);
-      const [menuFeedbackLoading, setMenuFeedbackLoading] = useState(false);
+const days = [
+    'Common','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+  ];
 
-      useEffect(() => {
+// Helper to render menu cell with red items
+function renderMenuCell(cellValue) {
+  if (!cellValue) return null;
+  const [normal, red] = cellValue.split("||");
+  const normalItems = normal
+    ? normal
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean)
+    : [];
+  const redItems = red
+    ? red
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean)
+    : [];
+  return (
+    <span>
+      {normalItems.map((item, idx) => (
+        <span key={idx}>
+          {item}
+          {idx < normalItems.length - 1 || redItems.length > 0 ? ", " : ""}
+        </span>
+      ))}
+      {redItems.map((item, idx) => (
+        <span
+          key={normalItems.length + idx}
+          style={{ color: "#f56565", fontWeight: 600 }}
+        >
+          {item}
+          {idx < redItems.length - 1 ? ", " : ""}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+const MenuFeedback = () => {
+  const [menuFeedbacks, setMenuFeedbacks] = useState([]);
+  const [menuFeedbackLoading, setMenuFeedbackLoading] = useState(false);
+
+  useEffect(() => {
         fetchMenuFeedbacks();
       }, []);
 
@@ -42,34 +64,116 @@ export const MenuPage = () => {
         }
       };
     // Feedback form state
-    const [feedbackDay, setFeedbackDay] = useState('');
-    const [feedbackMeal, setFeedbackMeal] = useState('');
-    const [feedbackDescription, setFeedbackDescription] = useState('');
-    const [feedbackMessage, setFeedbackMessage] = useState('');
+      const [feedbackDay, setFeedbackDay] = useState('');
+      const [feedbackMeal, setFeedbackMeal] = useState('');
+      const [feedbackDescription, setFeedbackDescription] = useState('');
+      const [feedbackRating, setFeedbackRating] = useState(5);
+      const [feedbackMessage, setFeedbackMessage] = useState('');
 
     const handleFeedbackSubmit = async (e) => {
       e.preventDefault();
-      try {
-        await axios.post(`${backend}/api/menu-feedback`, {
-          day: feedbackDay,
-          meal: feedbackMeal,
-          description: feedbackDescription,
-        });
-        setFeedbackMessage('Feedback submitted!');
-        setFeedbackDay('');
-        setFeedbackMeal('');
-        setFeedbackDescription('');
-        fetchMenuFeedbacks();
-        setTimeout(() => setFeedbackMessage(''), 3000);
-      } catch (err) {
-        setFeedbackMessage('Error submitting feedback');
-      }
+        try {
+          await axios.post(`${backend}/api/menu-feedback`, {
+            day: feedbackDay,
+            meal: feedbackMeal,
+            description: feedbackDescription,
+            rating: feedbackRating,
+          });
+          setFeedbackMessage('Feedback submitted!');
+          setFeedbackDay('');
+          setFeedbackMeal('');
+          setFeedbackDescription('');
+          setFeedbackRating(5);
+          fetchMenuFeedbacks();
+          setTimeout(() => setFeedbackMessage(''), 3000);
+        } catch (err) {
+          setFeedbackMessage('Error submitting feedback');
+        }
     };
+
+  return (
+    <>
+      {/* User Feedback Form */}
+      <div className="feedback-form-section" style={{ marginTop: 32, padding: 16, border: '1px solid #ccc', borderRadius: 8,width: '80%',maxWidth: 700,background:"#f7fafc" }}>
+        <h2 style={{textAlign:'center' ,marginBottom : '15px',marginTop:'5px'}}>Submit Feedback on Current Menu</h2>
+        <form onSubmit={handleFeedbackSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div>
+            <label style={{ fontWeight: 600, marginRight: 8 }}>Day:</label>
+            <select value={feedbackDay} onChange={e => setFeedbackDay(e.target.value)} required style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #667eea', fontSize: 16, background: '#f7fafc', color: '#333', minWidth: 140 }}>
+              <option value="">Select Day</option>
+              {days.map(day => (
+                <option key={day} value={day}>{day}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label style={{ fontWeight: 600, marginRight: 8 }}>Meal:</label>
+            <select value={feedbackMeal} onChange={e => setFeedbackMeal(e.target.value)} required style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #667eea', fontSize: 16, background: '#f7fafc', color: '#333', minWidth: 140 }}>
+              <option value="">Select Meal</option>
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="dinner">Dinner</option>
+            </select>
+          </div>
+          <div>
+            <label style={{ fontWeight: 600, marginBottom: 4 }}>Description (optional):</label>
+            <textarea value={feedbackDescription} onChange={e => setFeedbackDescription(e.target.value)} style={{ width: '100%', minHeight: 60, padding: '8px 12px', borderRadius: 6, border: '1px solid #667eea', fontSize: 16, background: '#f7fafc', color: '#333' }} />
+          </div>
+            <div>
+              <label style={{ fontWeight: 600, marginBottom: 4 }}>Rating:</label>
+              <div className="rating-selector" style={{ display: 'flex', gap: 8 }}>
+                {[1, 2, 3, 4, 5].map(star => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`star${feedbackRating >= star ? ' active' : ''}`}
+                    style={{ fontSize: 24, color: feedbackRating >= star ? '#fbbf24' : '#c7d2fe', background: 'none', border: 'none', cursor: 'pointer', borderRadius: '50%', width: 36, height: 36 }}
+                    onClick={() => setFeedbackRating(star)}
+                  >
+                    {'\u2605'}
+                  </button>
+                ))}
+              </div>
+              <span style={{ marginLeft: 8 }}>Selected: {feedbackRating} out of 5</span>
+            </div>
+          <button type="submit" style={{ background: '#667eea', color: 'white', border: 'none', borderRadius: 6, fontWeight: 600, padding: '8px 16px', cursor: 'pointer', fontSize: 16 }}>Submit Feedback</button>
+        </form>
+        {feedbackMessage && <div style={{ marginTop: 8, color: '#38a169' }}>{feedbackMessage}</div>}
+      </div>
+      {/* Menu Feedback Section */}
+    <div className="menu-feedback-section" style={{ marginTop: 30, padding: 16, border: '1px solid #ccc', borderRadius: 8, width: '90%', maxWidth: 700,background:"#f7fafc"}}>
+        <h2 style={{textAlign:'center',marginTop:'5px'}}>Feedback submitted</h2>
+        <h4 style={{textAlign:'center',marginBottom:'20px'}}>(on changed menu)</h4>
+        {menuFeedbackLoading ? <div>Loading feedback...</div> : (
+          menuFeedbacks.length === 0 ? <div>No feedback yet.</div> : (
+            <ul style={{ paddingLeft: 0 }}>
+                {menuFeedbacks.map((fb, idx) => (
+                  <li key={idx} style={{ marginBottom: 12, listStyle: 'none', borderBottom: '1px solid #eee', paddingBottom: 8 }}>
+                    <strong>{fb.day} - {fb.meal}</strong><br />
+                    <span>{fb.description}</span><br />
+                    {typeof fb.rating === 'number' && fb.rating >= 1 && fb.rating <= 5 ? (
+                      <>
+                        <span style={{ color: '#fbbf24', fontSize: 18 }}>
+                          {'\u2605'.repeat(fb.rating)}{'\u2606'.repeat(5 - fb.rating)}
+                        </span>
+                        <span style={{ marginLeft: 8, color: '#333' }}>{`${fb.rating}/5`}</span>
+                      </>
+                    ) : (
+                      <span style={{ color: '#aaa', fontSize: 16 }}>No rating submitted</span>
+                    )}
+                  </li>
+              ))}
+            </ul>
+          )
+        )}
+      </div>
+    </>
+  );
+}
+              
+export const MenuPage = () => {
   const [menu, setMenu] = useState({});
   const [timings, setTimings] = useState(['8:00 AM - 9:00 AM','1:00 PM - 2:00 PM','8:00 PM - 9:00 PM']);
-  const days = [
-    'Common','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-  ];
   const defaultDay = { breakfast: '', lunch: '', dinner: '' };
   const [loading, setLoading] = useState(false);
 
@@ -138,53 +242,7 @@ export const MenuPage = () => {
         </table>
         </div>
       )}
-      {/* User Feedback Form */}
-      <div className="feedback-form-section" style={{ marginTop: 32, padding: 16, border: '1px solid #ccc', borderRadius: 8, maxWidth: 600 }}>
-        <h3>Submit Feedback on Current Menu</h3>
-        <form onSubmit={handleFeedbackSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div>
-            <label style={{ fontWeight: 600, marginRight: 8 }}>Day:</label>
-            <select value={feedbackDay} onChange={e => setFeedbackDay(e.target.value)} required style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #667eea', fontSize: 16, background: '#f7fafc', color: '#333', minWidth: 140 }}>
-              <option value="">Select Day</option>
-              {days.map(day => (
-                <option key={day} value={day}>{day}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label style={{ fontWeight: 600, marginRight: 8 }}>Meal:</label>
-            <select value={feedbackMeal} onChange={e => setFeedbackMeal(e.target.value)} required style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #667eea', fontSize: 16, background: '#f7fafc', color: '#333', minWidth: 140 }}>
-              <option value="">Select Meal</option>
-              <option value="breakfast">Breakfast</option>
-              <option value="lunch">Lunch</option>
-              <option value="dinner">Dinner</option>
-            </select>
-          </div>
-          <div>
-            <label style={{ fontWeight: 600, marginBottom: 4 }}>Description:</label>
-            <textarea value={feedbackDescription} onChange={e => setFeedbackDescription(e.target.value)} required style={{ width: '100%', minHeight: 60, padding: '8px 12px', borderRadius: 6, border: '1px solid #667eea', fontSize: 16, background: '#f7fafc', color: '#333' }} />
-          </div>
-          <button type="submit" style={{ background: '#667eea', color: 'white', border: 'none', borderRadius: 6, fontWeight: 600, padding: '8px 16px', cursor: 'pointer', fontSize: 16 }}>Submit Feedback</button>
-        </form>
-        {feedbackMessage && <div style={{ marginTop: 8, color: '#38a169' }}>{feedbackMessage}</div>}
-      </div>
-
-      {/* Show Menu Feedbacks */}
-      <div className="menu-feedback-section" style={{ marginTop: 24, padding: 16, border: '1px solid #eee', borderRadius: 8, maxWidth: 600 }}>
-        <h3>Feedback Submitted on Menu</h3>
-        {menuFeedbackLoading ? <div>Loading feedback...</div> : (
-          menuFeedbacks.length === 0 ? <div>No feedback yet.</div> : (
-            <ul style={{ paddingLeft: 0 }}>
-              {menuFeedbacks.map((fb, idx) => (
-                <li key={idx} style={{ marginBottom: 12, listStyle: 'none', borderBottom: '1px solid #eee', paddingBottom: 8 }}>
-                  <strong>{fb.day} - {fb.meal}</strong><br />
-                  <span>{fb.description}</span>
-                </li>
-              ))}
-            </ul>
-          )
-        )}
-      </div>
+      <MenuFeedback />
     </div>
   );
 };

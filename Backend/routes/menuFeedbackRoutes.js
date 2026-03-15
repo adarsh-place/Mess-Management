@@ -8,12 +8,12 @@ const secretaryMiddleware = require('../middleware/secretaryMiddleware');
 
 // Submit feedback
 router.post('/', authMiddleware, async (req, res) => {
-  const { day, meal, description } = req.body;
-  if (!day || !meal || !description) {
-    return res.status(400).json({ error: 'All fields required' });
+  const { day, meal, description, rating } = req.body;
+  if (!day || !meal || !rating) {
+    return res.status(400).json({ error: 'Day, meal, and rating are required' });
   }
   try {
-    const feedback = new MenuFeedback({ userId: req.userId, day, meal, description });
+    const feedback = new MenuFeedback({ userId: req.userId, day, meal, description, rating });
     await feedback.save();
     res.json({ success: true, feedback });
   } catch (err) {

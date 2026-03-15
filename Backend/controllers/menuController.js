@@ -11,7 +11,7 @@ exports.emailMenu = async (req, res) => {
     const timings = menu[0].timings || ["", "", ""];
     const pdfBuffer = await generateMenuPDF(days, timings);
     
-    const email = process.env.EMAIL_USER;
+    const email = process.env.SECY_MAIL;
     
     // Add timings row below headers
     // const timings = menu[0].timings || ["", "", ""];

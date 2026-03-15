@@ -3,6 +3,10 @@ import axios from 'axios';
 import '../styles/Secretary.css';
 import { backend } from '../../constant.js'; // Update import to use constant.js
 
+const days = [
+    'Common','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+  ];
+
 export function renderMenuCell(cellValue) {
   if (!cellValue) return null;
   const [normal, red] = cellValue.split('||');
@@ -20,8 +24,7 @@ export function renderMenuCell(cellValue) {
   );
 }
 
-export const ManageMenuPage = () => {
-    // Feedback state
+const FeedbackSection = ()=>{
     const [feedbacks, setFeedbacks] = useState([]);
     const [feedbackLoading, setFeedbackLoading] = useState(false);
     const [feedbackMealFilter, setFeedbackMealFilter] = useState('all');
@@ -46,15 +49,83 @@ export const ManageMenuPage = () => {
         setFeedbackLoading(false);
       }
     };
-        
-      
+    
+  // Calculate filtered feedbacks
+  const filteredFeedbacks = feedbacks.filter(fb => (feedbackMealFilter === 'all' || fb.meal === feedbackMealFilter) && (feedbackDayFilter === 'all' || fb.day === feedbackDayFilter));
+
+  // Calculate average rating
+  const ratings = filteredFeedbacks.map(fb => typeof fb.rating === 'number' && fb.rating >= 1 && fb.rating <= 5 ? fb.rating : null).filter(r => r !== null);
+  const avgRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : null;
+
+  return(
+    <div className="feedback-section" style={{ marginTop: 40, padding: 16, border: '1px solid #ccc', borderRadius: 8, maxWidth: 600 }}>
+      <h2 style={{ fontSize: '2rem', fontWeight: 700, textAlign: 'center', marginBottom: 24 }}>User Feedback on Current Menu</h2>
+      <div style={{ marginBottom: 12, display: 'flex', gap: 16 }}>
+        <div>
+          <label style={{ fontWeight: 600, marginRight: 8 }}>Filter by Meal:</label>
+          <select value={feedbackMealFilter} onChange={e => setFeedbackMealFilter(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #667eea', fontSize: 16, background: '#f7fafc', color: '#333', minWidth: 140 }}>
+            <option value="all">All</option>
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+          </select>
+        </div>
+        <div>
+          <label style={{ fontWeight: 600, marginRight: 8 }}>Filter by Day:</label>
+          <select value={feedbackDayFilter} onChange={e => setFeedbackDayFilter(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #667eea', fontSize: 16, background: '#f7fafc', color: '#333', minWidth: 140 }}>
+            <option value="all">All</option>
+            {days.map(day => (
+              <option key={day} value={day}>{day}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      {/* Average rating display */}
+      <div style={{ marginBottom: 18, textAlign: 'center' }}>
+        <span style={{ fontWeight: 600, fontSize: 18 }}>Average Rating:&nbsp;</span>
+        {avgRating !== null ? (
+          <span style={{ color: '#fbbf24', fontSize: 22 }}>
+            {'\u2605'.repeat(Math.round(avgRating))}{'\u2606'.repeat(5 - Math.round(avgRating))}
+          </span>
+        ) : (
+          <span style={{ color: '#aaa', fontSize: 16 }}>No ratings yet</span>
+        )}
+        {avgRating !== null && <span style={{ marginLeft: 8, color: '#333' }}>{avgRating.toFixed(2)}/5</span>}
+      </div>
+      {feedbackLoading ? <div>Loading feedback...</div> : (
+        feedbacks.length === 0 ? <div>No feedback yet.</div> : (
+          <ul style={{ paddingLeft: 0 }}>
+            {filteredFeedbacks.map((fb, idx) => (
+              <li key={idx} style={{ marginBottom: 12, listStyle: 'none', borderBottom: '1px solid #eee', paddingBottom: 8 }}>
+                <strong>{fb.day} - {fb.meal}</strong><br />
+                <span>{fb.description}</span><br />
+                {typeof fb.rating === 'number' && fb.rating >= 1 && fb.rating <= 5 ? (
+                  <>
+                    <span style={{ color: '#fbbf24', fontSize: 18 }}>
+                      {'\u2605'.repeat(fb.rating)}{'\u2606'.repeat(5 - fb.rating)}
+                    </span>
+                    <span style={{ marginLeft: 8, color: '#333' }}>{`${fb.rating}/5`}</span>
+                  </>
+                ) : (
+                  <span style={{ color: '#aaa', fontSize: 16 }}>No rating submitted</span>
+                )}
+                {fb.userId && fb.userId.name && (
+                  <div style={{ fontSize: 12, color: '#888' }}>By: {fb.userId.name} ({fb.userId.email})</div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )
+      )}
+    </div>
+  );
+}
+
+export const ManageMenuPage = () => {
   const [menu, setMenu] = useState({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const days = [
-    'Common','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-  ];
   const [timings, setTimings] = useState(['8:00 AM - 9:00 AM','1:00 PM - 2:00 PM','8:00 PM - 9:00 PM']);
   
   const [editDay, setEditDay] = useState('');
@@ -83,21 +154,21 @@ export const ManageMenuPage = () => {
   };
 
     // Save timings independently
-  const handleSaveTimings = async () => {
-    setLoading(true);
-    try {
-      // Send only timings to backend (keep menu unchanged)
-      await axios.put(`${backend}/api/menu/timings`, {timings
-      });
-      setMessage('Timings updated!');
-      setTimeout(() => setMessage(''), 3000);
-      fetchMenu();
-    } catch (err) {
-      setMessage('Error updating timings');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const handleSaveTimings = async () => {
+  //   setLoading(true);
+  //   try {
+  //     // Send only timings to backend (keep menu unchanged)
+  //     await axios.put(`${backend}/api/menu/timings`, {timings
+  //     });
+  //     setMessage('Timings updated!');
+  //     setTimeout(() => setMessage(''), 3000);
+  //     fetchMenu();
+  //   } catch (err) {
+  //     setMessage('Error updating timings');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchMenu = async () => {
     setLoading(true);
@@ -242,9 +313,8 @@ export const ManageMenuPage = () => {
       setMessage('All red items finalized and all menu feedbacks deleted!');
       setTimeout(() => setMessage(''), 3000);
       fetchMenu();
-      fetchFeedbacks();
     } catch (err) {
-      setMessage('Error finalizing menu or deleting feedbacks');
+      setMessage('Error finalizing menu or deleting feedbacks',err);
     } finally {
       setLoading(false);
     }
@@ -352,7 +422,7 @@ export const ManageMenuPage = () => {
           {loading ? 'Sending...' : 'Send Mail to Me'}
         </button>
         <button type="button" onClick={handleFinalize} className="menu-action-btn finalize" style={{ background: '#f56565', color: '#fff', fontWeight: 600 }}>
-          Finalize
+          Finalize and Delete Feedbacks
         </button>
       </div>
       {message && <div className="message">{message}</div>}
@@ -400,46 +470,7 @@ export const ManageMenuPage = () => {
           {loading ? 'Uploading...' : 'Upload Menu'}
         </button>
       </form> */}
-      <div className="feedback-section" style={{ marginTop: 40, padding: 16, border: '1px solid #ccc', borderRadius: 8, maxWidth: 600 }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 700, textAlign: 'center', marginBottom: 24 }}>User Feedback on Current Menu</h2>
-          <div style={{ marginBottom: 12, display: 'flex', gap: 16 }}>
-            <div>
-              <label style={{ fontWeight: 600, marginRight: 8 }}>Filter by Meal:</label>
-              <select value={feedbackMealFilter} onChange={e => setFeedbackMealFilter(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #667eea', fontSize: 16, background: '#f7fafc', color: '#333', minWidth: 140 }}>
-                <option value="all">All</option>
-                <option value="breakfast">Breakfast</option>
-                <option value="lunch">Lunch</option>
-                <option value="dinner">Dinner</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ fontWeight: 600, marginRight: 8 }}>Filter by Day:</label>
-              <select value={feedbackDayFilter} onChange={e => setFeedbackDayFilter(e.target.value)} style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #667eea', fontSize: 16, background: '#f7fafc', color: '#333', minWidth: 140 }}>
-                <option value="all">All</option>
-                {days.map(day => (
-                  <option key={day} value={day}>{day}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          {feedbackLoading ? <div>Loading feedback...</div> : (
-            feedbacks.length === 0 ? <div>No feedback yet.</div> : (
-              <ul style={{ paddingLeft: 0 }}>
-                {feedbacks
-                  .filter(fb => (feedbackMealFilter === 'all' || fb.meal === feedbackMealFilter) && (feedbackDayFilter === 'all' || fb.day === feedbackDayFilter))
-                  .map((fb, idx) => (
-                    <li key={idx} style={{ marginBottom: 12, listStyle: 'none', borderBottom: '1px solid #eee', paddingBottom: 8 }}>
-                      <strong>{fb.day} - {fb.meal}</strong><br />
-                      <span>{fb.description}</span>
-                      {fb.userId && fb.userId.name && (
-                        <div style={{ fontSize: 12, color: '#888' }}>By: {fb.userId.name} ({fb.userId.email})</div>
-                      )}
-                    </li>
-                  ))}
-              </ul>
-            )
-          )}
-        </div>
+      <FeedbackSection />
     </div>
   );
 };

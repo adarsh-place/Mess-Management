@@ -17,6 +17,12 @@ const MenuFeedbackSchema = new mongoose.Schema({
   },
   description: {
     type: String,
+    required: false,
+  },
+  rating: {
+    type: Number,
+    min: 1,
+    max: 5,
     required: true,
   },
   createdAt: {

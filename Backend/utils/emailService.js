@@ -1,4 +1,3 @@
-
 const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
 
@@ -15,7 +14,7 @@ const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 const sendEmail = async (to, subject, html, pdfBuffer) => {
   try {
     let messageParts = [
-      `From: ${process.env.EMAIL_USER}`,
+      `From: ${process.env.SECY_MAIL}`,
       `To: ${to}`,
       `Subject: ${subject}`,
       'MIME-Version: 1.0',
