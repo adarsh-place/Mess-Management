@@ -11,13 +11,6 @@ oauth2Client.setCredentials({ refresh_token: process.env.GMAIL_REFRESH_TOKEN });
 
 const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-// Function to send menu PDF to all members
-const emailMenuPDF = async (email, pdfBuffer, html) => {
-  const subject = 'Mess Menu Timetable';
-  const htmlBody = html || '<h2>Mess Menu Timetable</h2><p>Find attached the current menu timetable PDF.</p>';
-  sendEmail(email, subject, htmlBody, pdfBuffer);
-};
-
 // Function to send email using Gmail API
 const sendEmail = async (to, subject, html, pdfBuffer) => {
   try {
@@ -57,9 +50,15 @@ const sendEmail = async (to, subject, html, pdfBuffer) => {
   }
 };
 
+// Function to send menu PDF to all members
+const emailMenuPDF = async (email, pdfBuffer, html) => {
+  const subject = 'Mess Menu Timetable';
+  const htmlBody = html || '<h2>Mess Menu Timetable</h2><p>Find attached the current menu timetable PDF.</p>';
+  sendEmail(email, subject, htmlBody, pdfBuffer);
+};
+
 // Function to send complaint notification to mess secretary
-const sendComplaintNotification = async (secretaryEmail, complaintDetails) => {
-  console.log(secretaryEmail);
+const sendComplaintNotification = async (email, complaintDetails) => {
   const subject = 'New Complaint Received';
   const html = `
     <h2>New Complaint</h2>
@@ -69,7 +68,7 @@ const sendComplaintNotification = async (secretaryEmail, complaintDetails) => {
     <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
   `;
 
-  await sendEmail(secretaryEmail, subject, html);
+  await sendEmail(email, subject, html);
 };
 
 // Function to send notice to all members
@@ -88,22 +87,6 @@ const sendNoticeToMembers = async (emails, noticeDetails) => {
   await Promise.allSettled(emailPromises);
 };
 
-// Function to send menu update notification
-const sendMenuUpdateNotification = async (emails, menuDetails) => {
-  const subject = 'Menu Updated';
-  const html = `
-    <h2>Menu Updated for ${new Date(menuDetails.date).toLocaleDateString()}</h2>
-    <p><strong>Breakfast:</strong> ${menuDetails.breakfast.join(', ')}</p>
-    <p><strong>Lunch:</strong> ${menuDetails.lunch.join(', ')}</p>
-    <p><strong>Dinner:</strong> ${menuDetails.dinner.join(', ')}</p>
-  `;
-
-  // Send all emails simultaneously
-  const emailPromises = emails.map(email => sendEmail(email, subject, html));
-  
-  // Wait for all to finish (or use Promise.allSettled to ignore individual fails)
-  await Promise.allSettled(emailPromises);
-};
 
 // Function to send complaint reply notification to student
 const sendReplyNotification = async (studentEmail, replyDetails) => {
@@ -126,6 +109,5 @@ module.exports = {
   sendComplaintNotification,
   sendReplyNotification,
   sendNoticeToMembers,
-  sendMenuUpdateNotification,
   emailMenuPDF,
 };

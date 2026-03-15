@@ -1,9 +1,8 @@
 const Menu = require('../models/Menu');
 const User = require('../models/User');
-const { sendMenuUpdateNotification, emailMenuPDF } = require('../utils/emailService');
+const { emailMenuPDF } = require('../utils/emailService');
 const { generateMenuPDF } = require('../utils/menuPdf');
-// @desc    Email menu PDF to all users
-// @access  Private (Secretary)
+
 exports.emailMenu = async (req, res) => {
   try {
     const menu = await Menu.find()
@@ -12,7 +11,6 @@ exports.emailMenu = async (req, res) => {
     const timings = menu[0].timings || ["", "", ""];
     const pdfBuffer = await generateMenuPDF(days, timings);
     
-    const allUsers = await User.find({ role: 'student' });
     const email = process.env.EMAIL_USER;
     
     // Add timings row below headers
@@ -26,8 +24,6 @@ exports.emailMenu = async (req, res) => {
     // html += '</table>';
 
     let html = '';
-    // Send PDF and HTML table to all
-    console.log(html);
     await emailMenuPDF(email, pdfBuffer, html);
     res.status(200).json({ message: 'Menu PDF emailed to everyone!' });
   } catch (error) {
@@ -36,8 +32,6 @@ exports.emailMenu = async (req, res) => {
 };
 
 
-// @desc    Get current/upcoming menu
-// @access  Public
 exports.getMenu = async (req, res) => {
   try {
     const menu = await Menu.find();
@@ -47,8 +41,6 @@ exports.getMenu = async (req, res) => {
   }
 };
 
-// @desc    Update menu
-// @access  Private (Secretary)
 exports.updateMenu = async (req, res) => {
   try {
     const data = req.body;

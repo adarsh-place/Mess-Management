@@ -2,8 +2,6 @@ const Notice = require('../models/Notice');
 const User = require('../models/User');
 const { sendNoticeToMembers } = require('../utils/emailService');
 
-// @desc    Create and send notice
-// @access  Private (Secretary)
 exports.createNotice = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -21,10 +19,9 @@ exports.createNotice = async (req, res) => {
 
     await notice.save();
 
-    // Send notification to all members
-    const allUsers = await User.find({ role: 'secretary' });
-    const emails = allUsers.map(u => u.email);
-    console.log(emails);
+    // Send notification to all secys
+    const allSecy = await User.find({ role: 'secretary' });
+    const emails = allSecy.map(u => u.email);
     sendNoticeToMembers(emails, { title, message }); // fire and forget, do not await
 
     res.status(201).json({ message: 'Notice created and sent', notice });
@@ -33,8 +30,6 @@ exports.createNotice = async (req, res) => {
   }
 };
 
-// @desc    Get all notices
-// @access  Public
 exports.getNotices = async (req, res) => {
   try {
     const notices = await Notice.find().sort({ createdAt: -1 }).populate('createdBy', 'name email');

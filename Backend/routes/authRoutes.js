@@ -16,9 +16,6 @@ const generateToken = (id) => {
 // Google OAuth2 client for verifying ID tokens
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// @route   POST /api/auth/google
-// @desc    Login/Register via Google ID token — only if email exists in AllowedEmail
-// @access  Public
 router.post('/google', async (req, res) => {
   try {
     const { idToken } = req.body;
@@ -65,48 +62,44 @@ router.post('/google', async (req, res) => {
   }
 });
 
-// Keep password login for existing users
-// @route   POST /api/auth/login
-// @desc    Login a user
-// @access  Public
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
+// router.post('/login', async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
-    }
+//     if (!email || !password) {
+//       return res.status(400).json({ message: 'Email and password are required' });
+//     }
 
-    // Check if email is allowed
-    const allowed = await AllowedEmail.findOne({ email });
-    if (!allowed) {
-      return res.status(403).json({ message: 'Email not authorized' });
-    }
+//     // Check if email is allowed
+//     const allowed = await AllowedEmail.findOne({ email });
+//     if (!allowed) {
+//       return res.status(403).json({ message: 'Email not authorized' });
+//     }
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(400).json({ message: 'Invalid credentials' });
+//     }
 
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
+//     const isMatch = await user.matchPassword(password);
+//     if (!isMatch) {
+//       return res.status(400).json({ message: 'Invalid credentials' });
+//     }
 
-    const token = generateToken(user._id);
+//     const token = generateToken(user._id);
 
-    res.status(200).json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
+//     res.status(200).json({
+//       token,
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         role: user.role,
+//       },
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Server error', error: error.message });
+//   }
+// });
 
 module.exports = router;

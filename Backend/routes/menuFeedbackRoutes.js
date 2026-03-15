@@ -4,6 +4,7 @@ const router = express.Router();
 
 const authMiddleware = require('../middleware/authMiddleware');
 const User = require('../models/User');
+const secretaryMiddleware = require('../middleware/secretaryMiddleware');
 
 // Submit feedback
 router.post('/', authMiddleware, async (req, res) => {
@@ -37,7 +38,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // Delete all feedbacks (secretary only)
-router.delete('/all', authMiddleware, async (req, res) => {
+router.delete('/all', authMiddleware,secretaryMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     if (user.role !== 'secretary') {

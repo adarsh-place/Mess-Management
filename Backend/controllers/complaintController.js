@@ -1,9 +1,8 @@
 const Complaint = require('../models/Complaint');
 const User = require('../models/User');
-const { sendComplaintNotification } = require('../utils/emailService');
+// const { sendComplaintNotification } = require('../utils/emailService');
+const { sendReplyNotification } = require('../utils/emailService');
 
-// @desc    Submit a new complaint
-// @access  Private (Students)
 exports.submitComplaint = async (req, res) => {
   try {
     const { text, imageUrl } = req.body;
@@ -17,16 +16,16 @@ exports.submitComplaint = async (req, res) => {
     await complaint.save();
 
     // Send notification to mess secretary (non-blocking)
-    const secretary = await User.findOne({ role: 'secretary' });
-    if (secretary) {
-      const student = await User.findById(req.userId);
-      // Fire and forget - don't await
-      sendComplaintNotification(secretary.email, {
-        studentName: student.name,
-        text,
-        imageUrl,
-      }).catch(err => console.error('Email sending failed silently:', err.message));
-    }
+    // const secretary = await User.findOne({ role: 'secretary' });
+    // if (secretary) {
+    //   const student = await User.findById(req.userId);
+    //   // Fire and forget - don't await
+    //   sendComplaintNotification(secretary.email, {
+    //     studentName: student.name,
+    //     text,
+    //     imageUrl,
+    //   }).catch(err => console.error('Email sending failed silently:', err.message));
+    // }
 
     res.status(201).json({ message: 'Complaint submitted successfully', complaint });
   } catch (error) {
@@ -34,8 +33,6 @@ exports.submitComplaint = async (req, res) => {
   }
 };
 
-// @desc    Get all complaints
-// @access  Private (Secretary)
 exports.getAllComplaints = async (req, res) => {
   try {
     const complaints = await Complaint.find().populate('studentId', 'name email');
@@ -45,8 +42,6 @@ exports.getAllComplaints = async (req, res) => {
   }
 };
 
-// @desc    Get current student's complaints
-// @access  Private (Students)
 exports.getMyComplaints = async (req, res) => {
   try {
     const complaints = await Complaint.find({ studentId: req.userId })
@@ -58,8 +53,6 @@ exports.getMyComplaints = async (req, res) => {
   }
 };
 
-// @desc    Update complaint status
-// @access  Private (Secretary or Student who filed it)
 exports.updateComplaintStatus = async (req, res) => {
   try {
     const { complaintId } = req.params;
@@ -95,8 +88,6 @@ exports.updateComplaintStatus = async (req, res) => {
   }
 };
 
-// @desc    Add reply to complaint
-// @access  Private (Secretary)
 exports.addReply = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -135,7 +126,6 @@ exports.addReply = async (req, res) => {
     const student = await User.findById(complaint.studentId);
     const secretary = await User.findById(req.userId);
     if (user.role === 'secretary' && student) {
-      const { sendReplyNotification } = require('../utils/emailService');
       sendReplyNotification(student.email, {
         studentName: student.name,
         secretaryName: secretary.name,

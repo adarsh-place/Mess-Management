@@ -1,8 +1,5 @@
 const Poll = require('../models/Poll');
-const User = require('../models/User');
 
-// @desc    Create a new poll (Mess Secretary only)
-// @access  Private
 exports.createPoll = async (req, res) => {
   try {
     const { question, options, pollType = 'single', expiresAt } = req.body;
@@ -24,8 +21,6 @@ exports.createPoll = async (req, res) => {
   }
 };
 
-// @desc    Get all polls
-// @access  Public
 exports.getAllPolls = async (req, res) => {
   try {
     const polls = await Poll.find().populate('createdBy', 'name email');
@@ -43,8 +38,6 @@ exports.getAllPolls = async (req, res) => {
   }
 };
 
-// @desc    Vote on a poll
-// @access  Private
 exports.votePoll = async (req, res) => {
   try {
     const { pollId, selectedOptions } = req.body;
@@ -98,8 +91,6 @@ exports.votePoll = async (req, res) => {
   }
 };
 
-// @desc    Delete a poll (Mess Secretary only)
-// @access  Private
 exports.deletePoll = async (req, res) => {
   try {
     const { pollId } = req.params;
